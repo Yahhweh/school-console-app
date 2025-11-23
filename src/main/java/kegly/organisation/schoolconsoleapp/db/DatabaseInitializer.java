@@ -1,5 +1,6 @@
 package kegly.organisation.schoolconsoleapp.db;
 
+import kegly.organisation.schoolconsoleapp.exception.DBException;
 import lombok.AllArgsConstructor;
 
 import java.io.BufferedReader;
@@ -40,7 +41,7 @@ public class DatabaseInitializer {
             }
 
         } catch (IOException | SQLException e) {
-            throw new RuntimeException("Error initializing database from script: " + scriptName, e);
+            throw new DBException("Error initializing database from script: " + scriptName, e);
         }
     }
 }

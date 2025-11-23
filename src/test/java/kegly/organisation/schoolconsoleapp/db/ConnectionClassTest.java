@@ -23,9 +23,9 @@ class ConnectionClassTest {
 
         try (Connection connection = connectionClass.getConnection()) {
 
-            assertNotNull(connection, "Connection object should not be null");
+            assertNotNull(connection);
 
-            assertTrue(connection.isValid(1), "Connection should be valid and open");
+            assertTrue(connection.isValid(1));
 
         } catch (
                 SQLException e) {

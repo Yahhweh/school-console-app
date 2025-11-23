@@ -1,19 +1,20 @@
 package kegly.organisation.schoolconsoleapp.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class Student {
 
-    int student_id;
-    int group_id;
-    String first_name;
-    String last_name;
+    private Integer studentId;
+    private Integer groupId;
+    private String firstName;
+    private String lastName;
 
-    public Student(int student_id, int group_id, String first_name, String last_name) {
-        this.student_id = student_id;
-        this.group_id = group_id;
-        this.first_name = first_name;
-        this.last_name = last_name;
+    public Student(Integer groupId, String firstName, String lastName) {
+        this.groupId = groupId;
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 }

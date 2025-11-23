@@ -1,6 +1,5 @@
 package kegly.organisation.schoolconsoleapp.db;
 
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
@@ -16,11 +15,11 @@ class DatabaseInitializerTest {
         ConnectionClass connectionClass = new ConnectionClass("ds-connection.properties");
 
         try(Connection connection = connectionClass.getConnection()) {
-            DatabaseInitializer databaseInitializer = new DatabaseInitializer("scheme.sql");
+            DatabaseInitializer databaseInitializer = new DatabaseInitializer("schema.sql");
             databaseInitializer.runScript(connection);
 
             boolean tableExists = checkTableExists(connection, "students");
-            assertTrue(tableExists, "Table 'students' should exist after script execution");
+            assertTrue(tableExists);
         }
         catch (Exception e){
             fail("Initialization failed:: "+  e.getMessage());

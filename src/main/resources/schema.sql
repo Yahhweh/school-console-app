@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS students;
 DROP TABLE IF EXISTS groups;
 DROP TABLE IF EXISTS courses;
 
+
 CREATE TABLE groups (
                         group_id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                         group_name text NOT NULL
