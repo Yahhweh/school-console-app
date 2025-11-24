@@ -11,7 +11,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GroupDaoTest {
 
@@ -20,11 +20,11 @@ class GroupDaoTest {
 
     @BeforeEach
     void setup() {
-        connectionClass = new ConnectionClass("ds-connection.properties");
-        groupDao = new GroupDao(connectionClass);
+        connectionClass = new ConnectionClass();
+        groupDao = new GroupDao();
 
         try (Connection conn = connectionClass.getConnection()) {
-            DatabaseInitializer initializer = new DatabaseInitializer("schema.sql");
+            DatabaseInitializer initializer = new DatabaseInitializer();
             initializer.runScript(conn);
         } catch (SQLException e) {
             throw new DaoException(e.getMessage());
@@ -46,7 +46,7 @@ class GroupDaoTest {
         String testGroupName = "TEST-" + System.currentTimeMillis();
         Group newGroup = new Group(testGroupName);
 
-        List<Group> expected = List.of(new Group(testGroupName));
+        List<Group> expected = List.of(new Group(1, testGroupName));
 
         groupDao.save(newGroup);
 

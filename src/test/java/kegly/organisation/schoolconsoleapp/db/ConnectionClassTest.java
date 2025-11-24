@@ -1,13 +1,14 @@
 package kegly.organisation.schoolconsoleapp.db;
 
-import kegly.organisation.schoolconsoleapp.exception.DBException;
+import kegly.organisation.schoolconsoleapp.exception.DaoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ConnectionClassTest {
 
@@ -15,11 +16,11 @@ class ConnectionClassTest {
 
     @BeforeEach
     void setup() {
-        connectionClass = new ConnectionClass("ds-connection.properties");
+        connectionClass = new ConnectionClass();
     }
 
     @Test
-    void getConnection_returnConnection_whenRightData() {
+    void generate_returnsExactAmount_whenRequestedCountGiven() {
 
         try (Connection connection = connectionClass.getConnection()) {
 
@@ -29,18 +30,8 @@ class ConnectionClassTest {
 
         } catch (
                 SQLException e) {
-            fail("SQL Exception during validation: " + e.getMessage());
+            throw new DaoException(e.getMessage());
         }
-    }
-
-    @Test
-    void getConnection_throwDatabaseOperationException_whenWrongPath(){
-
-        ConnectionClass wrongConnector = new ConnectionClass("wrong.properies");
-
-        assertThrows(DBException.class, () -> {
-            wrongConnector.getConnection();
-        });
     }
 
 

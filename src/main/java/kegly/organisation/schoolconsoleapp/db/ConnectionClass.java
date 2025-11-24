@@ -11,11 +11,7 @@ import java.util.Properties;
 
 public class ConnectionClass {
 
-    String propertiesFileName;
-
-    public ConnectionClass(String propertiesFileName) {
-        this.propertiesFileName = propertiesFileName;
-    }
+    private static final String propertiesFileName = "ds-connection.properties";
 
     public Connection getConnection() {
         Properties properties = new Properties();
@@ -29,9 +25,9 @@ public class ConnectionClass {
             properties.load(input);
 
             return DriverManager.getConnection(
-                    properties.getProperty("ds.url"),
-                    properties.getProperty("ds.username"),
-                    properties.getProperty("ds.password")
+                properties.getProperty("ds.url"),
+                properties.getProperty("ds.username"),
+                properties.getProperty("ds.password")
             );
 
         } catch (IOException | SQLException e) {

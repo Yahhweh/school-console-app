@@ -12,10 +12,10 @@ class DatabaseInitializerTest {
 
     @Test
     void runScript_shouldCreateTables_whenFileExists() {
-        ConnectionClass connectionClass = new ConnectionClass("ds-connection.properties");
+        ConnectionClass connectionClass = new ConnectionClass();
 
         try(Connection connection = connectionClass.getConnection()) {
-            DatabaseInitializer databaseInitializer = new DatabaseInitializer("schema.sql");
+            DatabaseInitializer databaseInitializer = new DatabaseInitializer();
             databaseInitializer.runScript(connection);
 
             boolean tableExists = checkTableExists(connection, "students");

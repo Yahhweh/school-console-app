@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class DatabaseInitializer {
 
-    private final String scriptName;
+    private static final String scriptName = "schema.sql";
 
     public void runScript(Connection connection) {
 

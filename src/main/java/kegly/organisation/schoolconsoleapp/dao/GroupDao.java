@@ -13,11 +13,7 @@ import java.util.List;
 
 public class GroupDao {
 
-    private final ConnectionClass connectionClass;
-
-    public GroupDao(ConnectionClass connectionClass) {
-        this.connectionClass = connectionClass;
-    }
+    private static final ConnectionClass connectionClass = new ConnectionClass();
 
     public List<Group> findAll() {
         String sql = "SELECT * FROM groups";
@@ -30,8 +26,10 @@ public class GroupDao {
             ResultSet rs = st.executeQuery(sql);
 
             while (rs.next()) {
-                String group_name = rs.getString("group_name");
-                result.add(new Group(group_name));
+                Integer groupId = rs.getObject("group_id", Integer.class);
+                String groupName = rs.getString("group_name");
+
+                result.add(new Group(groupId, groupName));
             }
 
             return result;

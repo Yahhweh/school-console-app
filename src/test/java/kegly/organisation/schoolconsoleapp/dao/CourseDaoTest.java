@@ -11,20 +11,20 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CourseDaoTest {
 
     private ConnectionClass connectionClass;
-    private CourseDao courseDao;
+    CourseDao courseDao;
 
     @BeforeEach
     void setup() {
-        connectionClass = new ConnectionClass("ds-connection.properties");
+        connectionClass = new ConnectionClass();
         courseDao = new CourseDao(connectionClass);
 
         try (Connection conn = connectionClass.getConnection()) {
-            DatabaseInitializer initializer = new DatabaseInitializer("schema.sql");
+            DatabaseInitializer initializer = new DatabaseInitializer();
             initializer.runScript(conn);
         } catch (SQLException e) {
             throw new DaoException(e.getMessage());
@@ -32,7 +32,7 @@ class CourseDaoTest {
     }
 
     @Test
-    void getCourse_returnCourses_whenRightConnection() {
+    void findAll_returnCourses_whenRightConnection() {
         List<Course> expected = List.of();
 
         List<Course> result = courseDao.findAll();
@@ -42,7 +42,7 @@ class CourseDaoTest {
     }
 
     @Test
-    void addCourse_addCourseToSql() {
+    void save_addCourseToSql() {
         String testCourseName = "TEST-" + System.currentTimeMillis();
         String testCourseDescription = "TEST-" + System.currentTimeMillis() + 22;
 
@@ -58,22 +58,6 @@ class CourseDaoTest {
 
 
     }
-//
-//    @Test
-//    void findGroupsWithLessOrEqualStudents_returnEmptyCourse_whenLimitIsZero() {
-//        String uniqueName = "Test-Empty-" + System.currentTimeMillis();
-//        Group emptyGroup = new Group(uniqueName);
-//
-//        List<Group> expected = List.of(emptyGroup);
-//
-//        groupDao.save(emptyGroup);
-//
-//        List<Group> result = groupDao.findGroupsWithLessOrEqualStudents(1);
-//
-//
-//        assertEquals(expected, result);
-//
-//    }
 
 }
 
