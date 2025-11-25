@@ -58,11 +58,11 @@ class SchoolDataFactoryTest {
     void findGroupsWithLessOrEqualStudents_returnGroupsList_whenCountIsProvided() {
         int count = 15;
         List<Group> expected = Collections.singletonList(new Group(1, "Group A"));
-        when(groupDao.findGroupsWithLessOrEqualStudents(count)).thenReturn(expected);
+        when(studentDao.findGroupsWithLessOrEqualStudents(count)).thenReturn(expected);
 
         List<Group> result = schoolDataFactory.findGroupsWithLessOrEqualStudents(count);
 
-        verify(groupDao).findGroupsWithLessOrEqualStudents(count);
+        verify(studentDao).findGroupsWithLessOrEqualStudents(count);
         assertEquals(expected, result);
     }
 
