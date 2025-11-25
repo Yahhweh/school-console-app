@@ -15,7 +15,7 @@ public class InitialGroups implements InitialData {
 
     @Override
     public void generate() {
-        int AMOUNT_OF_GROUPS = 10;
+        final int AMOUNT_OF_GROUPS = 10;
         for (int i = 0; i < AMOUNT_OF_GROUPS; i++) {
             Group group = new Group(generateString());
             groupDao.save(group);
