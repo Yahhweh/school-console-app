@@ -48,7 +48,7 @@ public class SchoolDataFactory {
 
 
     public List<Group> findGroupsWithLessOrEqualStudents(int count) {
-        return groupDao.findGroupsWithLessOrEqualStudents(count);
+        return studentDao.findGroupsWithLessOrEqualStudents(count);
     }
 
     public List<Student> findStudentsByCourseName(String courseName) {

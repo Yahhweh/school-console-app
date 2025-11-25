@@ -54,34 +54,4 @@ public class GroupDao {
         }
 
     }
-
-    public List<Group> findGroupsWithLessOrEqualStudents(int count) {
-        List<Group> groups = new ArrayList<>();
-
-        try (Connection connection = connectionClass.getConnection()) {
-
-            String sql = """
-            Select g.group_id, g.group_name
-            From groups g
-            Left Join students s On g.group_id = s.group_id
-            Group by g.group_id, g.group_name
-            Having Count(s.student_id) <= ?
-            """;
-
-            PreparedStatement st = connection.prepareStatement(sql);
-
-            st.setInt(1, count);
-
-            try (ResultSet resultSet = st.executeQuery()) {
-                while (resultSet.next()) {
-                    groups.add(new Group(
-                        resultSet.getString("group_name")
-                    ));
-                }
-            }
-        } catch (SQLException e) {
-            throw new DaoException(e.getMessage());
-        }
-        return groups;
-    }
 }

@@ -1,6 +1,7 @@
 package kegly.organisation.schoolconsoleapp.dao;
 
 import kegly.organisation.schoolconsoleapp.db.ConnectionClass;
+import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
 import kegly.organisation.schoolconsoleapp.exception.DaoException;
 
@@ -71,24 +72,6 @@ public class StudentDao {
         }
     }
 
-    public List<Integer> findCoursesByStudentId(int studentId) {
-        String sql = "Select course_id from student_courses where(studentId = ?)";
-        List<Integer> result = new ArrayList<>();
-
-        try (Connection connection = connectionClass.getConnection();
-             Statement statement = connection.createStatement();) {
-            ResultSet rs = statement.executeQuery(sql);
-            while (rs.next()) {
-                Integer course_id = rs.getObject("course_id", Integer.class);
-                result.add(course_id);
-            }
-            return result;
-        } catch (SQLException e) {
-            throw new DaoException(e.getMessage());
-        }
-
-    }
-
     public void addIdGroups(int student_id, int group_id) {
         String sql = "UPDATE students set group_id = ? where(student_id = ?)";
 
@@ -102,6 +85,7 @@ public class StudentDao {
             throw new DaoException(e.getMessage());
         }
     }
+
     public void deleteById(int studentId) {
         String sql = "DELETE FROM students WHERE student_id = ?";
 
@@ -166,5 +150,35 @@ public class StudentDao {
         } catch (SQLException e) {
             throw new DaoException("Failed to find students by course name", e);
         }
+    }
+
+    public List<Group> findGroupsWithLessOrEqualStudents(int count) {
+        List<Group> groups = new ArrayList<>();
+
+        String sql = """
+        SELECT g.group_id, g.group_name
+        FROM groups g
+        LEFT JOIN students s ON g.group_id = s.group_id
+        GROUP BY g.group_id, g.group_name
+        HAVING COUNT(s.student_id) <= ?
+    """;
+
+        try (Connection connection = connectionClass.getConnection();
+             PreparedStatement st = connection.prepareStatement(sql)) {
+
+            st.setInt(1, count);
+
+            try (ResultSet resultSet = st.executeQuery()) {
+                while (resultSet.next()) {
+                    groups.add(new Group(
+                        resultSet.getInt("group_id"),
+                        resultSet.getString("group_name")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DaoException("Failed to find groups with student count constraint", e);
+        }
+        return groups;
     }
 }

@@ -1,6 +1,7 @@
 package kegly.organisation.schoolconsoleapp.dao;
 
 import kegly.organisation.schoolconsoleapp.db.ConnectionClass;
+import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
 import kegly.organisation.schoolconsoleapp.exception.DaoException;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,11 +24,16 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class StudentDaoTest {
 
-    @Mock private ConnectionClass connectionClass;
-    @Mock private Connection connection;
-    @Mock private PreparedStatement preparedStatement;
-    @Mock private Statement statement;
-    @Mock private ResultSet resultSet;
+    @Mock
+    private ConnectionClass connectionClass;
+    @Mock
+    private Connection connection;
+    @Mock
+    private PreparedStatement preparedStatement;
+    @Mock
+    private Statement statement;
+    @Mock
+    private ResultSet resultSet;
 
     private StudentDao studentDao;
 
@@ -66,5 +72,20 @@ class StudentDaoTest {
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals("Alice", result.get(0).getFirstName());
+    }
+
+    @Test
+    void findGroupsWithLessOrEqualStudents_returnEmptyGroup_whenLimitIsZero() {
+        String uniqueName = "Test-Empty-" + System.currentTimeMillis();
+        Student emptyGroup = new Student(null, null, uniqueName);
+
+        List<Student> expected = List.of(emptyGroup);
+
+        studentDao.save(emptyGroup);
+
+        List<Group> result = studentDao.findGroupsWithLessOrEqualStudents(1);
+
+
+        assertEquals(expected, result);
     }
 }

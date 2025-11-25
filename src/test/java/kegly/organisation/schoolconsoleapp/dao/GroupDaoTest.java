@@ -56,24 +56,7 @@ class GroupDaoTest {
 
 
     }
-
-    @Test
-    void findGroupsWithLessOrEqualStudents_returnEmptyGroup_whenLimitIsZero() {
-        String uniqueName = "Test-Empty-" + System.currentTimeMillis();
-        Group emptyGroup = new Group(uniqueName);
-
-        List<Group> expected = List.of(emptyGroup);
-
-        groupDao.save(emptyGroup);
-
-        List<Group> result = groupDao.findGroupsWithLessOrEqualStudents(1);
-
-
-        assertEquals(expected, result);
-
     }
-
-}
 
 
 
