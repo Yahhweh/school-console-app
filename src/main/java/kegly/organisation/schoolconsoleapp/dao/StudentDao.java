@@ -1,6 +1,6 @@
 package kegly.organisation.schoolconsoleapp.dao;
 
-import kegly.organisation.schoolconsoleapp.db.ConnectionClass;
+import kegly.organisation.schoolconsoleapp.db.DBConnection;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
 import kegly.organisation.schoolconsoleapp.exception.DaoException;
@@ -11,16 +11,16 @@ import java.util.List;
 
 public class StudentDao {
 
-    private final ConnectionClass connectionClass;
+    private final DBConnection DBConnection;
 
-    public StudentDao(ConnectionClass connectionClass) {
-        this.connectionClass = connectionClass;
+    public StudentDao(DBConnection DBConnection) {
+        this.DBConnection = DBConnection;
     }
 
     public void save(Student student) {
         String sql = "Insert into students (group_id, first_name, last_name) values (?, ?, ?)";
 
-        try (Connection connection = connectionClass.getConnection();
+        try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setObject(1, student.getGroupId(), Types.INTEGER);
@@ -38,7 +38,7 @@ public class StudentDao {
         List<Student> students = new ArrayList<>();
         String sql = "select * from students";
 
-        try (Connection connection = connectionClass.getConnection();
+        try (Connection connection = DBConnection.getConnection();
              Statement statement = connection.createStatement();
              ResultSet rs = statement.executeQuery(sql)) {
 
@@ -60,7 +60,7 @@ public class StudentDao {
     public void addCourseToStudent(int studentId, int courseId) {
         String sql = "Insert into student_courses(student_id, course_id) VALUES(?, ?)";
 
-        try (Connection connection = connectionClass.getConnection();
+        try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setObject(1, studentId, Types.INTEGER);
@@ -75,7 +75,7 @@ public class StudentDao {
     public void addIdGroups(int student_id, int group_id) {
         String sql = "UPDATE students set group_id = ? where(student_id = ?)";
 
-        try (Connection connection = connectionClass.getConnection();
+        try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setObject(1, group_id, Types.INTEGER);
             statement.setObject(2, student_id, Types.INTEGER);
@@ -89,7 +89,7 @@ public class StudentDao {
     public void deleteById(int studentId) {
         String sql = "DELETE FROM students WHERE student_id = ?";
 
-        try (Connection connection = connectionClass.getConnection();
+        try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, studentId);
@@ -107,7 +107,7 @@ public class StudentDao {
     public void removeStudentFromCourse(int studentId, int courseId) {
         String sql = "DELETE FROM student_courses WHERE student_id = ? AND course_id = ?";
 
-        try (Connection connection = connectionClass.getConnection();
+        try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, studentId);
@@ -130,7 +130,7 @@ public class StudentDao {
             WHERE c.course_name = ?
             """;
 
-        try (Connection connection = connectionClass.getConnection();
+        try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, courseName);
@@ -163,7 +163,7 @@ public class StudentDao {
         HAVING COUNT(s.student_id) <= ?
     """;
 
-        try (Connection connection = connectionClass.getConnection();
+        try (Connection connection = DBConnection.getConnection();
              PreparedStatement st = connection.prepareStatement(sql)) {
 
             st.setInt(1, count);

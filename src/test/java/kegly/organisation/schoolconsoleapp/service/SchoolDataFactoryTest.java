@@ -3,7 +3,7 @@ package kegly.organisation.schoolconsoleapp.service;
 import kegly.organisation.schoolconsoleapp.dao.CourseDao;
 import kegly.organisation.schoolconsoleapp.dao.GroupDao;
 import kegly.organisation.schoolconsoleapp.dao.StudentDao;
-import kegly.organisation.schoolconsoleapp.db.ConnectionClass;
+import kegly.organisation.schoolconsoleapp.db.DBConnection;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +31,7 @@ class SchoolDataFactoryTest {
     @Mock
     private CourseDao courseDao;
     @Mock
-    private ConnectionClass connectionClass;
+    private DBConnection DBConnection;
 
     private SchoolDataFactory schoolDataFactory;
 
@@ -41,7 +41,7 @@ class SchoolDataFactoryTest {
         injectMock("studentDao", studentDao);
         injectMock("groupDao", groupDao);
         injectMock("courseDao", courseDao);
-        injectMock("connectionClass", connectionClass);
+        injectMock("connectionClass", DBConnection);
     }
 
     private void injectMock(String fieldName, Object mock) {

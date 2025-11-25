@@ -3,7 +3,7 @@
 
 package kegly.organisation.schoolconsoleapp.dao;
 
-import kegly.organisation.schoolconsoleapp.db.ConnectionClass;
+import kegly.organisation.schoolconsoleapp.db.DBConnection;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.exception.DaoException;
 
@@ -13,11 +13,11 @@ import java.util.List;
 
 public class GroupDao {
 
-    private static final ConnectionClass connectionClass = new ConnectionClass();
+    private static final DBConnection DB_CONNECTION = new DBConnection();
 
     public List<Group> findAll() {
         String sql = "SELECT * FROM groups";
-        try (Connection connection = connectionClass.getConnection()) {
+        try (Connection connection = DB_CONNECTION.getConnection()) {
 
             List<Group> result = new ArrayList<>();
 
@@ -41,7 +41,7 @@ public class GroupDao {
 
     public void save(Group group) {
         String sql = "Insert into groups(group_name) values(?)";
-        try (Connection connection = connectionClass.getConnection()) {
+        try (Connection connection = DB_CONNECTION.getConnection()) {
 
             PreparedStatement st = connection.prepareStatement(sql);
 

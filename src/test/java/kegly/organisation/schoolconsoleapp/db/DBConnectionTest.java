@@ -10,19 +10,19 @@ import java.sql.SQLException;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ConnectionClassTest {
+class DBConnectionTest {
 
-    private ConnectionClass connectionClass;
+    private DBConnection DBConnection;
 
     @BeforeEach
     void setup() {
-        connectionClass = new ConnectionClass();
+        DBConnection = new DBConnection();
     }
 
     @Test
     void generate_returnsExactAmount_whenRequestedCountGiven() {
 
-        try (Connection connection = connectionClass.getConnection()) {
+        try (Connection connection = DBConnection.getConnection()) {
 
             assertNotNull(connection);
 

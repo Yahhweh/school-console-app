@@ -1,6 +1,6 @@
 package kegly.organisation.schoolconsoleapp.dao;
 
-import kegly.organisation.schoolconsoleapp.db.ConnectionClass;
+import kegly.organisation.schoolconsoleapp.db.DBConnection;
 import kegly.organisation.schoolconsoleapp.entity.Course;
 import kegly.organisation.schoolconsoleapp.exception.DaoException;
 
@@ -10,15 +10,15 @@ import java.util.List;
 
 public class CourseDao {
 
-    private final ConnectionClass connectionClass;
+    private final DBConnection DBConnection;
 
-    public CourseDao(ConnectionClass connectionClass) {
-        this.connectionClass = connectionClass;
+    public CourseDao(DBConnection DBConnection) {
+        this.DBConnection = DBConnection;
     }
 
     public List<Course> findAll() {
         String sql = "SELECT * FROM courses";
-        try (Connection connection = connectionClass.getConnection()) {
+        try (Connection connection = DBConnection.getConnection()) {
 
             List<Course> result = new ArrayList<>();
 
@@ -40,7 +40,7 @@ public class CourseDao {
 
     public void save(Course course) {
         String sql = "Insert into courses(course_name, course_description) values(?, ?)";
-        try (Connection connection = connectionClass.getConnection()) {
+        try (Connection connection = DBConnection.getConnection()) {
 
             PreparedStatement st = connection.prepareStatement(sql);
 

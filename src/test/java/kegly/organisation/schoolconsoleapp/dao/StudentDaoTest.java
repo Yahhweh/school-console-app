@@ -1,6 +1,6 @@
 package kegly.organisation.schoolconsoleapp.dao;
 
-import kegly.organisation.schoolconsoleapp.db.ConnectionClass;
+import kegly.organisation.schoolconsoleapp.db.DBConnection;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
 import kegly.organisation.schoolconsoleapp.exception.DaoException;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 class StudentDaoTest {
 
     @Mock
-    private ConnectionClass connectionClass;
+    private DBConnection DBConnection;
     @Mock
     private Connection connection;
     @Mock
@@ -39,8 +39,8 @@ class StudentDaoTest {
 
     @BeforeEach
     void setUp() throws DaoException {
-        studentDao = new StudentDao(connectionClass);
-        lenient().when(connectionClass.getConnection()).thenReturn(connection);
+        studentDao = new StudentDao(DBConnection);
+        lenient().when(DBConnection.getConnection()).thenReturn(connection);
     }
 
     @Test

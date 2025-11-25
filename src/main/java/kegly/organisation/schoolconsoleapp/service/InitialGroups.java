@@ -1,11 +1,8 @@
 package kegly.organisation.schoolconsoleapp.service;
 
 import kegly.organisation.schoolconsoleapp.dao.GroupDao;
-import kegly.organisation.schoolconsoleapp.db.ConnectionClass;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public class InitialGroups implements InitialData {

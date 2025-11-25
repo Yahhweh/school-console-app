@@ -9,7 +9,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class ConnectionClass {
+public class DBConnection {
 
     private static final String propertiesFileName = "ds-connection.properties";
 

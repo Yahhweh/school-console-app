@@ -1,6 +1,6 @@
 package kegly.organisation.schoolconsoleapp.dao;
 
-import kegly.organisation.schoolconsoleapp.db.ConnectionClass;
+import kegly.organisation.schoolconsoleapp.db.DBConnection;
 import kegly.organisation.schoolconsoleapp.db.DatabaseInitializer;
 import kegly.organisation.schoolconsoleapp.entity.Course;
 import kegly.organisation.schoolconsoleapp.exception.DaoException;
@@ -15,15 +15,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CourseDaoTest {
 
-    private ConnectionClass connectionClass;
+    private DBConnection DBConnection;
     CourseDao courseDao;
 
     @BeforeEach
     void setup() {
-        connectionClass = new ConnectionClass();
-        courseDao = new CourseDao(connectionClass);
+        DBConnection = new DBConnection();
+        courseDao = new CourseDao(DBConnection);
 
-        try (Connection conn = connectionClass.getConnection()) {
+        try (Connection conn = DBConnection.getConnection()) {
             DatabaseInitializer initializer = new DatabaseInitializer();
             initializer.runScript(conn);
         } catch (SQLException e) {

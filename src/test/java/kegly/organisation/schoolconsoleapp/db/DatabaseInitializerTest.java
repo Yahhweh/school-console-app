@@ -12,9 +12,9 @@ class DatabaseInitializerTest {
 
     @Test
     void runScript_shouldCreateTables_whenFileExists() {
-        ConnectionClass connectionClass = new ConnectionClass();
+        DBConnection DBConnection = new DBConnection();
 
-        try(Connection connection = connectionClass.getConnection()) {
+        try(Connection connection = DBConnection.getConnection()) {
             DatabaseInitializer databaseInitializer = new DatabaseInitializer();
             databaseInitializer.runScript(connection);
 
