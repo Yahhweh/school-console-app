@@ -1,7 +1,7 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.GroupDao;
-import kegly.organisation.schoolconsoleapp.dao.StudentDao;
+import kegly.organisation.schoolconsoleapp.dao.GroupDaoImpl;
+import kegly.organisation.schoolconsoleapp.dao.StudentDaoImpl;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
 
@@ -12,12 +12,12 @@ import java.util.Random;
 
 public class InitialStudents implements InitialData {
 
-    private final StudentDao studentDao;
-    private final GroupDao groupDao;
+    private final StudentDaoImpl studentDaoImpl;
+    private final GroupDaoImpl groupDaoImpl;
 
-    public InitialStudents(StudentDao studentDao, GroupDao groupDao) {
-        this.studentDao = studentDao;
-        this.groupDao = groupDao;
+    public InitialStudents(StudentDaoImpl studentDaoImpl, GroupDaoImpl groupDaoImpl) {
+        this.studentDaoImpl = studentDaoImpl;
+        this.groupDaoImpl = groupDaoImpl;
     }
 
     private static final List<String> FIRST_NAMES = List.of(
@@ -44,14 +44,14 @@ public class InitialStudents implements InitialData {
             String firstName = FIRST_NAMES.get(random.nextInt(FIRST_NAMES.size()));
             String lastName = LAST_NAMES.get(random.nextInt(LAST_NAMES.size()));
 
-            studentDao.save(new Student(null, firstName, lastName));
+            studentDaoImpl.save(new Student(null, firstName, lastName));
         }
     }
 
     public void assignRandomGroups() {
-        List<Group> groups = groupDao.findAll();
+        List<Group> groups = groupDaoImpl.findAll();
 
-        List<Student> allStudents = studentDao.findAll();
+        List<Student> allStudents = studentDaoImpl.findAll();
         Queue<Student> studentQueue = new ArrayDeque<>(allStudents);
 
         Random random = new Random();
@@ -72,7 +72,7 @@ public class InitialStudents implements InitialData {
 
                 Student student = studentQueue.poll();
 
-                studentDao.addIdGroups(student.getStudentId(), group.getGroup_id());
+                studentDaoImpl.addIdGroups(student.getStudentId(), group.getGroup_id());
             }
         }
     }

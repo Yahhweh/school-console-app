@@ -1,7 +1,7 @@
 package kegly.organisation.schoolconsoleapp.dao;
 
 import kegly.organisation.schoolconsoleapp.db.DBConnection;
-import kegly.organisation.schoolconsoleapp.db.DatabaseInitializer;
+import kegly.organisation.schoolconsoleapp.db.SchemaLoader;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.exception.DaoException;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,19 +13,20 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class GroupDaoTest {
+class GroupDaoImplTest {
 
     private DBConnection DBConnection;
-    private GroupDao groupDao;
+    private GroupDaoImpl groupDaoImpl;
 
     @BeforeEach
     void setup() {
         DBConnection = new DBConnection();
-        groupDao = new GroupDao();
+        groupDaoImpl = new GroupDaoImpl();
+        final String initialSql = "schema.sql";
 
         try (Connection conn = DBConnection.getConnection()) {
-            DatabaseInitializer initializer = new DatabaseInitializer();
-            initializer.runScript(conn);
+            SchemaLoader initializer = new SchemaLoader();
+            initializer.runScript(conn, initialSql);
         } catch (SQLException e) {
             throw new DaoException(e.getMessage());
         }
@@ -35,7 +36,7 @@ class GroupDaoTest {
     void getGroups_returnGroups_whenRightConnection() {
         List<Group> expected = List.of();
 
-        List<Group> result = groupDao.findAll();
+        List<Group> result = groupDaoImpl.findAll();
 
         assertEquals(expected, result);
 
@@ -48,9 +49,9 @@ class GroupDaoTest {
 
         List<Group> expected = List.of(new Group(1, testGroupName));
 
-        groupDao.save(newGroup);
+        groupDaoImpl.save(newGroup);
 
-        List<Group> result = groupDao.findAll();
+        List<Group> result = groupDaoImpl.findAll();
 
         assertEquals(expected,result);
 

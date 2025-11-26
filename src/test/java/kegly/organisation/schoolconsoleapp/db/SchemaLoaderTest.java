@@ -8,15 +8,16 @@ import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DatabaseInitializerTest {
+class SchemaLoaderTest {
 
     @Test
     void runScript_shouldCreateTables_whenFileExists() {
         DBConnection DBConnection = new DBConnection();
+        final String initialSql = "schema.sql";
 
         try(Connection connection = DBConnection.getConnection()) {
-            DatabaseInitializer databaseInitializer = new DatabaseInitializer();
-            databaseInitializer.runScript(connection);
+            SchemaLoader schemaLoader = new SchemaLoader();
+            schemaLoader.runScript(connection, initialSql);
 
             boolean tableExists = checkTableExists(connection, "students");
             assertTrue(tableExists);

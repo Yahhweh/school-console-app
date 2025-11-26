@@ -1,17 +1,16 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.CourseDao;
+import kegly.organisation.schoolconsoleapp.dao.CourseDaoImpl;
 import kegly.organisation.schoolconsoleapp.entity.Course;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class InitialCourses implements InitialData {
 
-    CourseDao courseDao;
+    CourseDaoImpl courseDaoImpl;
 
-    public InitialCourses(CourseDao courseDao) {
-        this.courseDao = courseDao;
+    public InitialCourses(CourseDaoImpl courseDaoImpl) {
+        this.courseDaoImpl = courseDaoImpl;
     }
 
     @Override
@@ -30,16 +29,11 @@ public class InitialCourses implements InitialData {
         );
 
         for (int i = 0; i < SUBJECTS.size(); i++) {
-            courseDao.save(new Course(SUBJECTS.get(i), generateDescription(SUBJECTS.get(i))));
+            courseDaoImpl.save(new Course(SUBJECTS.get(i), generateDescription(SUBJECTS.get(i))));
         }
-
     }
 
     private String generateDescription(String subject) {
-
         return "It is " + subject + ". You will study this subject the whole year";
-
     }
-
-
 }

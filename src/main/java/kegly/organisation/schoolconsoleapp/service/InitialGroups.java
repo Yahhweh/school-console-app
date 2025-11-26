@@ -1,16 +1,16 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.GroupDao;
+import kegly.organisation.schoolconsoleapp.dao.GroupDaoImpl;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 
 import java.util.Random;
 
 public class InitialGroups implements InitialData {
 
-    private final GroupDao groupDao;
+    private final GroupDaoImpl groupDaoImpl;
 
-    public InitialGroups(GroupDao groupDao) {
-        this.groupDao = groupDao;
+    public InitialGroups(GroupDaoImpl groupDaoImpl) {
+        this.groupDaoImpl = groupDaoImpl;
     }
 
     @Override
@@ -18,7 +18,7 @@ public class InitialGroups implements InitialData {
         final int AMOUNT_OF_GROUPS = 10;
         for (int i = 0; i < AMOUNT_OF_GROUPS; i++) {
             Group group = new Group(generateString());
-            groupDao.save(group);
+            groupDaoImpl.save(group);
         }
     }
 

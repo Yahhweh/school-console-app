@@ -1,13 +1,13 @@
 package kegly.organisation.schoolconsoleapp;
 
-import kegly.organisation.schoolconsoleapp.service.SchoolDataFactory;
+import kegly.organisation.schoolconsoleapp.service.SchoolDataFacade;
 import kegly.organisation.schoolconsoleapp.ui.ConsoleMenu;
 
 public class Main {
 
     public static void main(String[] args) {
         try {
-            SchoolDataFactory dataFactory = new SchoolDataFactory();
+            SchoolDataFacade dataFactory = new SchoolDataFacade();
 
             dataFactory.initializeDatabase();
 

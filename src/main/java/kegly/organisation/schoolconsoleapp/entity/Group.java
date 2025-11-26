@@ -4,15 +4,15 @@ import lombok.Data;
 
 @Data
 public class Group {
-    private Integer group_id;
-    private String group_name;
+    private Integer groupId;
+    private String groupName;
 
     public Group(String groupName) {
-        this.group_name = groupName;
+        this.groupName = groupName;
     }
 
     public Group(Integer groupId, String groupName) {
-        this.group_id = groupId;
-        this.group_name = groupName;
+        this.groupId = groupId;
+        this.groupName = groupName;
     }
 }

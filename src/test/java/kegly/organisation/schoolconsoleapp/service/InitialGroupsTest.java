@@ -1,6 +1,6 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.GroupDao;
+import kegly.organisation.schoolconsoleapp.dao.GroupDaoImpl;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,13 +9,13 @@ import static org.mockito.Mockito.*;
 
 public class InitialGroupsTest {
 
-    private GroupDao mockGroupDao;
+    private GroupDaoImpl mockGroupDaoImpl;
     private InitialGroups initialGroups;
 
     @BeforeEach
     void setup() {
-        mockGroupDao = mock(GroupDao.class);
-        initialGroups = new InitialGroups(mockGroupDao);
+        mockGroupDaoImpl = mock(GroupDaoImpl.class);
+        initialGroups = new InitialGroups(mockGroupDaoImpl);
     }
 
     @Test
@@ -23,6 +23,6 @@ public class InitialGroupsTest {
 
         initialGroups.generate();
 
-        verify(mockGroupDao, times(10)).save(any(Group.class));
+        verify(mockGroupDaoImpl, times(10)).save(any(Group.class));
     }
 }

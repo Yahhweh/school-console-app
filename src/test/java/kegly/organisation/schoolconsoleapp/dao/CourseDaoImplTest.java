@@ -1,7 +1,7 @@
 package kegly.organisation.schoolconsoleapp.dao;
 
 import kegly.organisation.schoolconsoleapp.db.DBConnection;
-import kegly.organisation.schoolconsoleapp.db.DatabaseInitializer;
+import kegly.organisation.schoolconsoleapp.db.SchemaLoader;
 import kegly.organisation.schoolconsoleapp.entity.Course;
 import kegly.organisation.schoolconsoleapp.exception.DaoException;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,19 +13,20 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class CourseDaoTest {
+class CourseDaoImplTest {
 
     private DBConnection DBConnection;
-    CourseDao courseDao;
+    CourseDaoImpl courseDaoImpl;
 
     @BeforeEach
     void setup() {
         DBConnection = new DBConnection();
-        courseDao = new CourseDao(DBConnection);
+        courseDaoImpl = new CourseDaoImpl(DBConnection);
+        final String initialSql = "schema.sql";
 
         try (Connection conn = DBConnection.getConnection()) {
-            DatabaseInitializer initializer = new DatabaseInitializer();
-            initializer.runScript(conn);
+            SchemaLoader initializer = new SchemaLoader();
+            initializer.runScript(conn, initialSql);
         } catch (SQLException e) {
             throw new DaoException(e.getMessage());
         }
@@ -35,7 +36,7 @@ class CourseDaoTest {
     void findAll_returnCourses_whenRightConnection() {
         List<Course> expected = List.of();
 
-        List<Course> result = courseDao.findAll();
+        List<Course> result = courseDaoImpl.findAll();
 
         assertEquals(expected, result);
 
@@ -50,9 +51,9 @@ class CourseDaoTest {
 
         List<Course> expected = List.of(new Course(testCourseName, testCourseDescription));
 
-        courseDao.save(newCourse);
+        courseDaoImpl.save(newCourse);
 
-        List<Course> result = courseDao.findAll();
+        List<Course> result = courseDaoImpl.findAll();
 
         assertEquals(expected,result);
 

@@ -1,6 +1,6 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.StudentDao;
+import kegly.organisation.schoolconsoleapp.dao.StudentDaoImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,10 +8,10 @@ import java.util.Random;
 
 public class InitialStudentsToCourses implements InitialData {
 
-    private final StudentDao studentDao;
+    private final StudentDaoImpl studentDaoImpl;
 
-    public InitialStudentsToCourses(StudentDao studentDao) {
-        this.studentDao = studentDao;
+    public InitialStudentsToCourses(StudentDaoImpl studentDaoImpl) {
+        this.studentDaoImpl = studentDaoImpl;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class InitialStudentsToCourses implements InitialData {
 
             availableCourseIds.remove(randomIndex);
 
-            studentDao.addCourseToStudent(studentId, courseId);
+            studentDaoImpl.addCourseToStudent(studentId, courseId);
         }
     }
 }

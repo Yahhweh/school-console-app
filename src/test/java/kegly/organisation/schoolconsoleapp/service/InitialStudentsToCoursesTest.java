@@ -1,6 +1,6 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.StudentDao;
+import kegly.organisation.schoolconsoleapp.dao.StudentDaoImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -8,13 +8,13 @@ import static org.mockito.Mockito.*;
 
 class InitialStudentsToCoursesTest {
 
-    StudentDao mockStudentDao;
+    StudentDaoImpl mockStudentDaoImpl;
     InitialStudentsToCourses studentsToCourses;
 
     @BeforeEach
     void setup() {
-        mockStudentDao = mock(StudentDao.class);
-        studentsToCourses = new InitialStudentsToCourses(mockStudentDao);
+        mockStudentDaoImpl = mock(StudentDaoImpl.class);
+        studentsToCourses = new InitialStudentsToCourses(mockStudentDaoImpl);
     }
 
 
@@ -23,7 +23,7 @@ class InitialStudentsToCoursesTest {
 
         studentsToCourses.generate();
 
-        verify(mockStudentDao, atLeast(210)).addCourseToStudent(any(Integer.class), any(Integer.class));
+        verify(mockStudentDaoImpl, atLeast(210)).addCourseToStudent(any(Integer.class), any(Integer.class));
     }
 
 }

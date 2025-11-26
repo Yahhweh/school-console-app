@@ -2,17 +2,17 @@ package kegly.organisation.schoolconsoleapp.ui;
 
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
-import kegly.organisation.schoolconsoleapp.service.SchoolDataFactory;
+import kegly.organisation.schoolconsoleapp.service.SchoolDataFacade;
 
 import java.util.List;
 import java.util.Scanner;
 
 public class ConsoleMenu {
 
-    private final SchoolDataFactory dataFactory;
+    private final SchoolDataFacade dataFactory;
     private final Scanner scanner;
 
-    public ConsoleMenu(SchoolDataFactory dataFactory) {
+    public ConsoleMenu(SchoolDataFacade dataFactory) {
         this.dataFactory = dataFactory;
         this.scanner = new Scanner(System.in);
     }

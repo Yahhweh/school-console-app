@@ -11,7 +11,7 @@ import java.util.Properties;
 
 public class DBConnection {
 
-    private static final String propertiesFileName = "ds-connection.properties";
+    private static final String propertiesFileName = "database.properties";
 
     public Connection getConnection() {
         Properties properties = new Properties();

@@ -1,10 +1,10 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.CourseDao;
-import kegly.organisation.schoolconsoleapp.dao.GroupDao;
-import kegly.organisation.schoolconsoleapp.dao.StudentDao;
+import kegly.organisation.schoolconsoleapp.dao.CourseDaoImpl;
+import kegly.organisation.schoolconsoleapp.dao.GroupDaoImpl;
+import kegly.organisation.schoolconsoleapp.dao.StudentDaoImpl;
 import kegly.organisation.schoolconsoleapp.db.DBConnection;
-import kegly.organisation.schoolconsoleapp.db.DatabaseInitializer;
+import kegly.organisation.schoolconsoleapp.db.SchemaLoader;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
 import kegly.organisation.schoolconsoleapp.exception.ServiceException;
@@ -13,32 +13,33 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-public class SchoolDataFactory {
+public class SchoolDataFacade {
 
     private final DBConnection DBConnection;
-    private final StudentDao studentDao;
-    private final GroupDao groupDao;
-    private final CourseDao courseDao;
+    private final StudentDaoImpl studentDaoImpl;
+    private final GroupDaoImpl groupDaoImpl;
+    private final CourseDaoImpl courseDaoImpl;
+    private static final String initialSql = "schema.sql";
 
-    public SchoolDataFactory() {
+    public SchoolDataFacade() {
         this.DBConnection = new DBConnection();
-        this.studentDao = new StudentDao(DBConnection);
-        this.groupDao = new GroupDao();
-        this.courseDao = new CourseDao(DBConnection);
+        this.studentDaoImpl = new StudentDaoImpl(DBConnection);
+        this.groupDaoImpl = new GroupDaoImpl();
+        this.courseDaoImpl = new CourseDaoImpl(DBConnection);
     }
 
     public void initializeDatabase() {
         try (Connection connection = DBConnection.getConnection()) {
             System.out.println("Initializing database schema");
-            new DatabaseInitializer().runScript(connection);
+            new SchemaLoader().runScript(connection, initialSql);
 
             System.out.println("Generating data");
-            new InitialCourses(courseDao).generate();
-            new InitialGroups(groupDao).generate();
-            InitialStudents initialStudents = new InitialStudents(studentDao, groupDao);
+            new InitialCourses(courseDaoImpl).generate();
+            new InitialGroups(groupDaoImpl).generate();
+            InitialStudents initialStudents = new InitialStudents(studentDaoImpl, groupDaoImpl);
             initialStudents.generate();
             initialStudents.assignRandomGroups();
-            new InitialStudentsToCourses(studentDao).generate();
+            new InitialStudentsToCourses(studentDaoImpl).generate();
 
             System.out.println("Data initialization completed.\n");
 
@@ -49,26 +50,26 @@ public class SchoolDataFactory {
 
 
     public List<Group> findGroupsWithLessOrEqualStudents(int count) {
-        return studentDao.findGroupsWithLessOrEqualStudents(count);
+        return studentDaoImpl.findGroupsWithLessOrEqualStudents(count);
     }
 
     public List<Student> findStudentsByCourseName(String courseName) {
-        return studentDao.findStudentsByCourseName(courseName);
+        return studentDaoImpl.findStudentsByCourseName(courseName);
     }
 
     public void addNewStudent(String firstName, String lastName, Integer groupId) {
-        studentDao.save(new Student(groupId, firstName, lastName));
+        studentDaoImpl.save(new Student(groupId, firstName, lastName));
     }
 
     public void deleteStudentById(int studentId) {
-        studentDao.deleteById(studentId);
+        studentDaoImpl.deleteById(studentId);
     }
 
     public void addStudentToCourse(int studentId, int courseId) {
-        studentDao.addCourseToStudent(studentId, courseId);
+        studentDaoImpl.addCourseToStudent(studentId, courseId);
     }
 
     public void removeStudentFromCourse(int studentId, int courseId) {
-        studentDao.removeStudentFromCourse(studentId, courseId);
+        studentDaoImpl.removeStudentFromCourse(studentId, courseId);
     }
 }

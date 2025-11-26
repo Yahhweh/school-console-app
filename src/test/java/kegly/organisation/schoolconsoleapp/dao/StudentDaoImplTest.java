@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class StudentDaoTest {
+class StudentDaoImplTest {
 
     @Mock
     private DBConnection DBConnection;
@@ -35,11 +35,11 @@ class StudentDaoTest {
     @Mock
     private ResultSet resultSet;
 
-    private StudentDao studentDao;
+    private StudentDaoImpl studentDaoImpl;
 
     @BeforeEach
     void setUp() throws DaoException {
-        studentDao = new StudentDao(DBConnection);
+        studentDaoImpl = new StudentDaoImpl(DBConnection);
         lenient().when(DBConnection.getConnection()).thenReturn(connection);
     }
 
@@ -48,7 +48,7 @@ class StudentDaoTest {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
 
         Student student = new Student(1, "John", "Doe");
-        studentDao.save(student);
+        studentDaoImpl.save(student);
 
         verify(preparedStatement).setObject(1, 1, java.sql.Types.INTEGER);
         verify(preparedStatement).setString(2, "John");
@@ -67,7 +67,7 @@ class StudentDaoTest {
         when(resultSet.getString("first_name")).thenReturn("Alice");
         when(resultSet.getString("last_name")).thenReturn("Smith");
 
-        List<Student> result = studentDao.findAll();
+        List<Student> result = studentDaoImpl.findAll();
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -81,9 +81,9 @@ class StudentDaoTest {
 
         List<Student> expected = List.of(emptyGroup);
 
-        studentDao.save(emptyGroup);
+        studentDaoImpl.save(emptyGroup);
 
-        List<Group> result = studentDao.findGroupsWithLessOrEqualStudents(1);
+        List<Group> result = studentDaoImpl.findGroupsWithLessOrEqualStudents(1);
 
 
         assertEquals(expected, result);

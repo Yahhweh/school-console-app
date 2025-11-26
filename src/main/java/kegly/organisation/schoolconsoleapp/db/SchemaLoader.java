@@ -13,11 +13,9 @@ import java.sql.Statement;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
-public class DatabaseInitializer {
+public class SchemaLoader {
 
-    private static final String scriptName = "schema.sql";
-
-    public void runScript(Connection connection) {
+    public void runScript(Connection connection, String scriptName) {
 
         try (InputStream input = getClass().getClassLoader().getResourceAsStream(scriptName)) {
 

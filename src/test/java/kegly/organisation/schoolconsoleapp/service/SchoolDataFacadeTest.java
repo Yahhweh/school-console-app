@@ -1,8 +1,8 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.CourseDao;
-import kegly.organisation.schoolconsoleapp.dao.GroupDao;
-import kegly.organisation.schoolconsoleapp.dao.StudentDao;
+import kegly.organisation.schoolconsoleapp.dao.CourseDaoImpl;
+import kegly.organisation.schoolconsoleapp.dao.GroupDaoImpl;
+import kegly.organisation.schoolconsoleapp.dao.StudentDaoImpl;
 import kegly.organisation.schoolconsoleapp.db.DBConnection;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
@@ -22,33 +22,33 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class SchoolDataFactoryTest {
+class SchoolDataFacadeTest {
 
     @Mock
-    private StudentDao studentDao;
+    private StudentDaoImpl studentDaoImpl;
     @Mock
-    private GroupDao groupDao;
+    private GroupDaoImpl groupDaoImpl;
     @Mock
-    private CourseDao courseDao;
+    private CourseDaoImpl courseDaoImpl;
     @Mock
     private DBConnection DBConnection;
 
-    private SchoolDataFactory schoolDataFactory;
+    private SchoolDataFacade schoolDataFacade;
 
     @BeforeEach
     void setUp() {
-        schoolDataFactory = new SchoolDataFactory();
-        injectMock("studentDao", studentDao);
-        injectMock("groupDao", groupDao);
-        injectMock("courseDao", courseDao);
+        schoolDataFacade = new SchoolDataFacade();
+        injectMock("studentDao", studentDaoImpl);
+        injectMock("groupDao", groupDaoImpl);
+        injectMock("courseDao", courseDaoImpl);
         injectMock("connectionClass", DBConnection);
     }
 
     private void injectMock(String fieldName, Object mock) {
         try {
-            Field field = SchoolDataFactory.class.getDeclaredField(fieldName);
+            Field field = SchoolDataFacade.class.getDeclaredField(fieldName);
             field.setAccessible(true);
-            field.set(schoolDataFactory, mock);
+            field.set(schoolDataFacade, mock);
         } catch (Exception e) {
             throw new RuntimeException("Failed to inject mock for field: " + fieldName, e);
         }
@@ -58,11 +58,11 @@ class SchoolDataFactoryTest {
     void findGroupsWithLessOrEqualStudents_returnGroupsList_whenCountIsProvided() {
         int count = 15;
         List<Group> expected = Collections.singletonList(new Group(1, "Group A"));
-        when(studentDao.findGroupsWithLessOrEqualStudents(count)).thenReturn(expected);
+        when(studentDaoImpl.findGroupsWithLessOrEqualStudents(count)).thenReturn(expected);
 
-        List<Group> result = schoolDataFactory.findGroupsWithLessOrEqualStudents(count);
+        List<Group> result = schoolDataFacade.findGroupsWithLessOrEqualStudents(count);
 
-        verify(studentDao).findGroupsWithLessOrEqualStudents(count);
+        verify(studentDaoImpl).findGroupsWithLessOrEqualStudents(count);
         assertEquals(expected, result);
     }
 
@@ -70,11 +70,11 @@ class SchoolDataFactoryTest {
     void findStudentsByCourseName_returnStudentList_whenCourseNameIsRight() {
         String courseName = "Math";
         List<Student> expected = Collections.singletonList(new Student(1, 1, "John", "Doe"));
-        when(studentDao.findStudentsByCourseName(courseName)).thenReturn(expected);
+        when(studentDaoImpl.findStudentsByCourseName(courseName)).thenReturn(expected);
 
-        List<Student> result = schoolDataFactory.findStudentsByCourseName(courseName);
+        List<Student> result = schoolDataFacade.findStudentsByCourseName(courseName);
 
-        verify(studentDao).findStudentsByCourseName(courseName);
+        verify(studentDaoImpl).findStudentsByCourseName(courseName);
         assertEquals(expected, result);
     }
 
@@ -84,18 +84,18 @@ class SchoolDataFactoryTest {
         String lastName = "Wonderland";
         Integer groupId = 10;
 
-        schoolDataFactory.addNewStudent(firstName, lastName, groupId);
+        schoolDataFacade.addNewStudent(firstName, lastName, groupId);
 
-        verify(studentDao).save(any(Student.class));
+        verify(studentDaoImpl).save(any(Student.class));
     }
 
     @Test
     void deleteStudentById_callDaoDelete_whenIdIsProvided() {
         int studentId = 5;
 
-        schoolDataFactory.deleteStudentById(studentId);
+        schoolDataFacade.deleteStudentById(studentId);
 
-        verify(studentDao).deleteById(studentId);
+        verify(studentDaoImpl).deleteById(studentId);
     }
 
     @Test
@@ -103,9 +103,9 @@ class SchoolDataFactoryTest {
         int studentId = 1;
         int courseId = 2;
 
-        schoolDataFactory.addStudentToCourse(studentId, courseId);
+        schoolDataFacade.addStudentToCourse(studentId, courseId);
 
-        verify(studentDao).addCourseToStudent(studentId, courseId);
+        verify(studentDaoImpl).addCourseToStudent(studentId, courseId);
     }
 
     @Test
@@ -113,8 +113,8 @@ class SchoolDataFactoryTest {
         int studentId = 1;
         int courseId = 2;
 
-        schoolDataFactory.removeStudentFromCourse(studentId, courseId);
+        schoolDataFacade.removeStudentFromCourse(studentId, courseId);
 
-        verify(studentDao).removeStudentFromCourse(studentId, courseId);
+        verify(studentDaoImpl).removeStudentFromCourse(studentId, courseId);
     }
 }
