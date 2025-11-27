@@ -4,27 +4,39 @@ import kegly.organisation.schoolconsoleapp.db.DBConnection;
 import kegly.organisation.schoolconsoleapp.db.SchemaLoader;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.exception.DaoException;
+import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.swing.plaf.nimbus.State;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GroupDaoImplTest {
 
-    private DBConnection DBConnection;
+    private DBConnection dBConnection;
     private GroupDaoImpl groupDaoImpl;
+    private static final String dropAll = "DROP ALL OBJECTS";
 
     @BeforeEach
     void setup() {
-        DBConnection = new DBConnection();
-        groupDaoImpl = new GroupDaoImpl();
+        dBConnection = new DBConnection(){
+            @Override
+            public Connection getConnection(){
+                return super.getTestConnection();
+            }
+        };
+        groupDaoImpl = new GroupDaoImpl(dBConnection);
         final String initialSql = "schema.sql";
 
-        try (Connection conn = DBConnection.getConnection()) {
+        try (Connection conn = dBConnection.getConnection();
+             Statement statement = conn.createStatement()) {
+
+            statement.execute(dropAll);
             SchemaLoader initializer = new SchemaLoader();
             initializer.runScript(conn, initialSql);
         } catch (SQLException e) {

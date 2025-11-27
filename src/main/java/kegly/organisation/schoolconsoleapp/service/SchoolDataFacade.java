@@ -29,7 +29,7 @@ public class SchoolDataFacade {
     public SchoolDataFacade() {
         this.DBConnection = new DBConnection();
         this.studentDaoImpl = new StudentDaoImpl(DBConnection);
-        this.groupDaoImpl = new GroupDaoImpl();
+        this.groupDaoImpl = new GroupDaoImpl(DBConnection);
         this.courseDaoImpl = new CourseDaoImpl(DBConnection);
     }
 

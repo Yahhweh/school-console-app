@@ -7,24 +7,32 @@ import kegly.organisation.schoolconsoleapp.exception.DaoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CourseDaoImplTest {
 
-    private DBConnection DBConnection;
-    CourseDaoImpl courseDaoImpl;
+    private DBConnection dbConnection;
+    private CourseDaoImpl courseDaoImpl;
+    private static final String dropAll = "DROP ALL OBJECTS";
 
     @BeforeEach
     void setup() {
-        DBConnection = new DBConnection();
-        courseDaoImpl = new CourseDaoImpl(DBConnection);
+        dbConnection = new DBConnection(){
+            @Override
+            public   Connection getConnection(){
+                return super.getTestConnection();
+            }
+        };
+        courseDaoImpl = new CourseDaoImpl(dbConnection);
         final String initialSql = "schema.sql";
 
-        try (Connection conn = DBConnection.getConnection()) {
+        try (Connection conn = dbConnection.getConnection();
+             Statement statement = conn.createStatement()) {
+
+            statement.execute(dropAll);
             SchemaLoader initializer = new SchemaLoader();
             initializer.runScript(conn, initialSql);
         } catch (SQLException e) {
@@ -57,8 +65,6 @@ class CourseDaoImplTest {
         List<Course> result = courseDaoImpl.findAll();
 
         assertEquals(expected,result);
-
-
     }
 
 }

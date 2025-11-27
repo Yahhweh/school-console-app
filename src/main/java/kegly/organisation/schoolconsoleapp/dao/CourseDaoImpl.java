@@ -14,7 +14,7 @@ public class CourseDaoImpl implements  CourseDao {
 
     private static final String findAllSql = "SELECT * FROM courses";
     private static final String saveSql = "INSERT INTO courses(course_name, course_description) VALUES (?, ?)";
-    private static final String findCoursesByStudentIdSql = "Select course_id from student_courses where(studentId = ?)";
+    private static final String findCoursesByStudentIdSql = "SELECT course_id FROM student_courses WHERE (studentId = ?)";
 
     public CourseDaoImpl(DBConnection DBConnection) {
         this.DBConnection = DBConnection;
@@ -72,8 +72,8 @@ public class CourseDaoImpl implements  CourseDao {
         List<Course> result = new ArrayList<>();
 
         try (Connection connection = DBConnection.getConnection();
-             Statement statement = connection.createStatement();) {
-            ResultSet rs = statement.executeQuery(findCoursesByStudentIdSql);
+             PreparedStatement statement = connection.prepareStatement(findCoursesByStudentIdSql);) {
+            ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 Integer courseId = rs.getObject("course_id", Integer.class);
                 String courseName = rs.getString("course_name");

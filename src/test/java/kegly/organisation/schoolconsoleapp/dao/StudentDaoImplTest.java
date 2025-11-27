@@ -1,91 +1,68 @@
 package kegly.organisation.schoolconsoleapp.dao;
 
 import kegly.organisation.schoolconsoleapp.db.DBConnection;
-import kegly.organisation.schoolconsoleapp.entity.Group;
+import kegly.organisation.schoolconsoleapp.db.SchemaLoader;
 import kegly.organisation.schoolconsoleapp.entity.Student;
 import kegly.organisation.schoolconsoleapp.exception.DaoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ExtendWith(MockitoExtension.class)
 class StudentDaoImplTest {
 
-    @Mock
-    private DBConnection DBConnection;
-    @Mock
-    private Connection connection;
-    @Mock
-    private PreparedStatement preparedStatement;
-    @Mock
-    private Statement statement;
-    @Mock
-    private ResultSet resultSet;
-
+    private DBConnection dBConnection;
     private StudentDaoImpl studentDaoImpl;
+    private static final String DROP_ALL = "DROP ALL OBJECTS";
 
     @BeforeEach
-    void setUp() throws DaoException {
-        studentDaoImpl = new StudentDaoImpl(DBConnection);
-        lenient().when(DBConnection.getConnection()).thenReturn(connection);
+    void setup() {
+        dBConnection = new DBConnection() {
+            @Override
+            public Connection getConnection() {
+                return super.getTestConnection();
+            }
+        };
+        studentDaoImpl = new StudentDaoImpl(dBConnection);
+
+        final String initialSql = "schema.sql";
+
+        try (Connection conn = dBConnection.getConnection();
+             Statement statement = conn.createStatement()) {
+
+            statement.execute(DROP_ALL);
+            SchemaLoader initializer = new SchemaLoader();
+            initializer.runScript(conn, initialSql);
+        } catch (SQLException e) {
+            throw new DaoException(e.getMessage());
+        }
     }
 
     @Test
-    void save_ShouldExecuteInsert() throws SQLException {
-        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-
-        Student student = new Student(1, "John", "Doe");
-        studentDaoImpl.save(student);
-
-        verify(preparedStatement).setObject(1, 1, java.sql.Types.INTEGER);
-        verify(preparedStatement).setString(2, "John");
-        verify(preparedStatement).setString(3, "Doe");
-        verify(preparedStatement).executeUpdate();
-    }
-
-    @Test
-    void findAll_ShouldReturnListOfStudents() throws SQLException {
-        when(connection.createStatement()).thenReturn(statement);
-        when(statement.executeQuery(anyString())).thenReturn(resultSet);
-
-        when(resultSet.next()).thenReturn(true).thenReturn(false);
-        when(resultSet.getObject("student_id", Integer.class)).thenReturn(1);
-        when(resultSet.getObject("group_id", Integer.class)).thenReturn(10);
-        when(resultSet.getString("first_name")).thenReturn("Alice");
-        when(resultSet.getString("last_name")).thenReturn("Smith");
+    void findAll_returnStudents_whenRightConnection() {
+        List<Student> expected = List.of();
 
         List<Student> result = studentDaoImpl.findAll();
 
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals("Alice", result.get(0).getFirstName());
+        assertEquals(expected, result);
     }
 
     @Test
-    void findGroupsWithLessOrEqualStudents_returnEmptyGroup_whenLimitIsZero() {
-        String uniqueName = "Test-Empty-" + System.currentTimeMillis();
-        Student emptyStudent = new Student(null, null, uniqueName);
+    void save_addStudentToSql() {
+        Integer expectedId = 1;
+        String firstName = "John";
+        String lastName = "Doe-" + System.currentTimeMillis();
 
+        Student newStudent = new Student(expectedId, null, firstName, lastName);
 
-        List<Student> expected = List.of(emptyStudent);
-
-        studentDaoImpl.save(emptyStudent);
-
-        List<Group> result = studentDaoImpl.findGroupsWithLessOrEqualStudents(1);
-
+        List<Student> expected = List.of(newStudent);
+        studentDaoImpl.save(newStudent);
+        List<Student> result = studentDaoImpl.findAll();
 
         assertEquals(expected, result);
     }

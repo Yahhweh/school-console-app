@@ -13,14 +13,18 @@ import java.util.List;
 
 public class GroupDaoImpl implements GroupDao{
 
-    private static final DBConnection DB_CONNECTION = new DBConnection();
+    private DBConnection dBConnection;
 
     private static final String findAllSql = "SELECT * FROM groups";
     private static final String saveSql = "INSERT INTO groups(group_name) VALUES(?)";
 
+    public GroupDaoImpl(DBConnection dbConnection) {
+        this.dBConnection = dbConnection;
+    }
+
     @Override
     public List<Group> findAll() {
-        try (Connection connection = DB_CONNECTION.getConnection()) {
+        try (Connection connection = dBConnection.getConnection()) {
 
             List<Group> result = new ArrayList<>();
 
@@ -43,7 +47,7 @@ public class GroupDaoImpl implements GroupDao{
 
     @Override
     public void save(Group group) {
-        try (Connection connection = DB_CONNECTION.getConnection()) {
+        try (Connection connection = dBConnection.getConnection()) {
 
             PreparedStatement st = connection.prepareStatement(saveSql);
 
