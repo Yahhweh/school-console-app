@@ -23,6 +23,8 @@ public class SchoolDataFacade {
     private static final int coursesAmount = 10;
     private static final int groupsAmount = 10;
     private static final int studentsAmount = 200;
+    private static final int MIN_COURSES_PER_STUDENT = 1;
+    private static final int MAX_COURSES_PER_STUDENT = 3;
 
     public SchoolDataFacade() {
         this.DBConnection = new DBConnection();
@@ -42,7 +44,13 @@ public class SchoolDataFacade {
             StudentsSeeder studentsSeeder = new StudentsSeeder(studentDaoImpl, groupDaoImpl);
             studentsSeeder.generate(studentsAmount);
             studentsSeeder.assignRandomGroups(10, 30);
-            new StudentsToCoursesSeeder(studentDaoImpl).generate(studentsAmount);
+
+            new StudentsToCoursesSeeder(
+                studentDaoImpl,
+                courseDaoImpl,
+                MIN_COURSES_PER_STUDENT,
+                MAX_COURSES_PER_STUDENT
+            ).generate(studentsAmount);
 
             System.out.println("Data initialization completed.\n");
 
@@ -50,7 +58,6 @@ public class SchoolDataFacade {
             throw new ServiceException("Initialization failed", e);
         }
     }
-
 
     public List<Group> findGroupsWithLessOrEqualStudents(int count) {
         return studentDaoImpl.findGroupsWithLessOrEqualStudents(count);
