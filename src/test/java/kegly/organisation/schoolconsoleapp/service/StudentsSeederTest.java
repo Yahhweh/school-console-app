@@ -8,22 +8,24 @@ import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.*;
 
-class InitialStudentsTest {
+class StudentsSeederTest {
 
     StudentDaoImpl mockStudent;
     GroupDaoImpl mockGroup;
-    InitialStudents initialStudents;
+    StudentsSeeder studentsSeeder;
+    private static final int studentsAmount = 200;
+
 
     @BeforeEach
     void setup() {
         mockStudent = mock(StudentDaoImpl.class);
         mockGroup = mock(GroupDaoImpl.class);
-        initialStudents = new InitialStudents(mockStudent, mockGroup);
+        studentsSeeder = new StudentsSeeder(mockStudent, mockGroup);
     }
 
     @Test
     public void randomCourses() {
-        initialStudents.generate();
+        studentsSeeder.generate(studentsAmount);
         verify(mockStudent, times(200)).save(any(Student.class));
     }
 }

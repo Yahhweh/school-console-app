@@ -20,6 +20,9 @@ public class SchoolDataFacade {
     private final GroupDaoImpl groupDaoImpl;
     private final CourseDaoImpl courseDaoImpl;
     private static final String initialSql = "schema.sql";
+    private static final int coursesAmount = 10;
+    private static final int groupsAmount = 10;
+    private static final int studentsAmount = 200;
 
     public SchoolDataFacade() {
         this.DBConnection = new DBConnection();
@@ -34,12 +37,12 @@ public class SchoolDataFacade {
             new SchemaLoader().runScript(connection, initialSql);
 
             System.out.println("Generating data");
-            new InitialCourses(courseDaoImpl).generate();
-            new InitialGroups(groupDaoImpl).generate();
-            InitialStudents initialStudents = new InitialStudents(studentDaoImpl, groupDaoImpl);
-            initialStudents.generate();
-            initialStudents.assignRandomGroups();
-            new InitialStudentsToCourses(studentDaoImpl).generate();
+            new CoursesSeeder(courseDaoImpl).generate(coursesAmount);
+            new GroupsSeeder(groupDaoImpl).generate(groupsAmount);
+            StudentsSeeder studentsSeeder = new StudentsSeeder(studentDaoImpl, groupDaoImpl);
+            studentsSeeder.generate(studentsAmount);
+            studentsSeeder.assignRandomGroups(10, 30);
+            new StudentsToCoursesSeeder(studentDaoImpl).generate(studentsAmount);
 
             System.out.println("Data initialization completed.\n");
 

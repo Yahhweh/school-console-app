@@ -19,24 +19,25 @@ public class StudentDaoImpl implements  StudentDao{
     private static final String deleteByIdSql = "DELETE FROM students WHERE student_id = ?";
     private static final String removeStudentFromCourseSql = "DELETE FROM student_courses WHERE student_id = ? AND course_id = ?";
     private static final String findStudentsByCourseNameSql = """
-        SELECT g.group_id, g.group_name
-        FROM groups g
-        LEFT JOIN students s ON g.group_id = s.group_id
-        GROUP BY g.group_id, g.group_name
-        HAVING COUNT(s.student_id) <= ?
-    """;
+    SELECT s.student_id, s.group_id, s.first_name, s.last_name
+    FROM students s
+    JOIN student_courses sc ON s.student_id = sc.student_id
+    JOIN courses c ON sc.course_id = c.course_id
+    WHERE c.course_name = ?
+""";
     private static final String findGroupsWithLessOrEqualStudentsSql = """
-            SELECT s.student_id, s.group_id, s.first_name, s.last_name
-            FROM students s
-            JOIN student_courses sc ON s.student_id = sc.student_id
-            JOIN courses c ON sc.course_id = c.course_id
-            WHERE c.course_name = ?
-            """;
+    SELECT g.group_id, g.group_name
+    FROM groups g
+    LEFT JOIN students s ON g.group_id = s.group_id
+    GROUP BY g.group_id, g.group_name
+    HAVING COUNT(s.student_id) <= ?
+""";
 
     public StudentDaoImpl(DBConnection DBConnection) {
         this.DBConnection = DBConnection;
     }
 
+    @Override
     public void save(Student student) {
 
         try (Connection connection = DBConnection.getConnection();
@@ -53,12 +54,13 @@ public class StudentDaoImpl implements  StudentDao{
         }
     }
 
+    @Override
     public List<Student> findAll() {
         List<Student> students = new ArrayList<>();
 
         try (Connection connection = DBConnection.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet rs = statement.executeQuery(findAllSql)) {
+             PreparedStatement statement = connection.prepareStatement(findAllSql);
+             ResultSet rs = statement.executeQuery()) {
 
             while (rs.next()) {
                 Integer studentId = rs.getObject("student_id", Integer.class);
@@ -75,6 +77,7 @@ public class StudentDaoImpl implements  StudentDao{
         }
     }
 
+    @Override
     public void addCourseToStudent(int studentId, int courseId) {
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(addCourseToStudentSql)) {
@@ -88,6 +91,8 @@ public class StudentDaoImpl implements  StudentDao{
         }
     }
 
+
+    @Override
     public void addIdGroups(int student_id, int group_id) {
 
         try (Connection connection = DBConnection.getConnection();
@@ -118,6 +123,7 @@ public class StudentDaoImpl implements  StudentDao{
         }
     }
 
+    @Override
     public void removeStudentFromCourse(int studentId, int courseId) {
 
         try (Connection connection = DBConnection.getConnection();
@@ -133,6 +139,7 @@ public class StudentDaoImpl implements  StudentDao{
         }
     }
 
+    @Override
     public List<Student> findStudentsByCourseName(String courseName) {
         List<Student> students = new ArrayList<>();
 
@@ -158,9 +165,9 @@ public class StudentDaoImpl implements  StudentDao{
         }
     }
 
+    @Override
     public List<Group> findGroupsWithLessOrEqualStudents(int count) {
         List<Group> groups = new ArrayList<>();
-
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement st = connection.prepareStatement(findGroupsWithLessOrEqualStudentsSql)) {
 

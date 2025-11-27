@@ -7,19 +7,18 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-public class InitialCoursesTest {
+public class CoursesSeederTest {
 
     private CourseDaoImpl mockCourseDaoImpl;
-    private InitialCourses initialCourses;
+    private CoursesSeeder coursesSeeder;
+    private static final int coursesAmount = 10;
 
     @BeforeEach
     void setup() {
         mockCourseDaoImpl = mock(CourseDaoImpl.class);
-        initialCourses = new InitialCourses(mockCourseDaoImpl);
+        coursesSeeder = new CoursesSeeder(mockCourseDaoImpl);
     }
 
     @Test
@@ -27,7 +26,7 @@ public class InitialCoursesTest {
 
         when(mockCourseDaoImpl.findAll()).thenReturn(List.of());
 
-        initialCourses.generate();
+        coursesSeeder.generate(coursesAmount);
 
         verify(mockCourseDaoImpl, times(10)).save(any(Course.class));
     }

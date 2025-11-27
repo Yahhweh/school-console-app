@@ -77,11 +77,12 @@ class StudentDaoImplTest {
     @Test
     void findGroupsWithLessOrEqualStudents_returnEmptyGroup_whenLimitIsZero() {
         String uniqueName = "Test-Empty-" + System.currentTimeMillis();
-        Student emptyGroup = new Student(null, null, uniqueName);
+        Student emptyStudent = new Student(null, null, uniqueName);
 
-        List<Student> expected = List.of(emptyGroup);
 
-        studentDaoImpl.save(emptyGroup);
+        List<Student> expected = List.of(emptyStudent);
+
+        studentDaoImpl.save(emptyStudent);
 
         List<Group> result = studentDaoImpl.findGroupsWithLessOrEqualStudents(1);
 

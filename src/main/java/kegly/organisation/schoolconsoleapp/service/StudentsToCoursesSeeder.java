@@ -1,33 +1,34 @@
 package kegly.organisation.schoolconsoleapp.service;
 
+import kegly.organisation.schoolconsoleapp.dao.StudentDao;
 import kegly.organisation.schoolconsoleapp.dao.StudentDaoImpl;
+import kegly.organisation.schoolconsoleapp.entity.Student;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class InitialStudentsToCourses implements InitialData {
+public class StudentsToCoursesSeeder implements Seeder {
 
     private final StudentDaoImpl studentDaoImpl;
 
-    public InitialStudentsToCourses(StudentDaoImpl studentDaoImpl) {
+    public StudentsToCoursesSeeder(StudentDaoImpl studentDaoImpl) {
         this.studentDaoImpl = studentDaoImpl;
     }
 
     @Override
-    public void generate() {
+    public void generate(int amount) {
         int maxCoursesPerStudent = 3;
         int minCoursesPerStudent = 1;
         Random random = new Random();
+        List<Student> students = studentDaoImpl.findAll();
 
-        int studentQuantity = 200;
 
-        for (int i = 0; i < studentQuantity; i++) {
+        for (int i = 0; i < amount; i++) {
             int quantityCourses = random.nextInt(maxCoursesPerStudent - minCoursesPerStudent + 1) + minCoursesPerStudent;
 
-            int studentId = i + 1;
-
-            assignCourses(studentId, quantityCourses);
+            //fix it later
+            assignCourses(i+1, quantityCourses);
         }
     }
 

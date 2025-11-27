@@ -44,12 +44,13 @@ class CourseDaoImplTest {
 
     @Test
     void save_addCourseToSql() {
+        Integer testId = 1;
         String testCourseName = "TEST-" + System.currentTimeMillis();
         String testCourseDescription = "TEST-" + System.currentTimeMillis() + 22;
 
-        Course newCourse = new Course(testCourseName,testCourseDescription);
+        Course newCourse = new Course(testId,testCourseName,testCourseDescription);
 
-        List<Course> expected = List.of(new Course(testCourseName, testCourseDescription));
+        List<Course> expected = List.of(new Course(testId,testCourseName, testCourseDescription));
 
         courseDaoImpl.save(newCourse);
 

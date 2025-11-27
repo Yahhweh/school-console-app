@@ -5,6 +5,7 @@ import kegly.organisation.schoolconsoleapp.entity.Course;
 import java.util.List;
 
 public interface CourseDao {
-    public List<Course> findAll();
-    public void save(Course course);
+     List<Course> findAll();
+     void save(Course course);
+    List<Course> findCoursesByStudentId(int studentId);
 }

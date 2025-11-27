@@ -7,21 +7,21 @@ import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.*;
 
-public class InitialGroupsTest {
+public class GroupsSeederTest {
 
     private GroupDaoImpl mockGroupDaoImpl;
-    private InitialGroups initialGroups;
-
+    private GroupsSeeder groupsSeeder;
+    private static final int groupsAmount = 10;
     @BeforeEach
     void setup() {
         mockGroupDaoImpl = mock(GroupDaoImpl.class);
-        initialGroups = new InitialGroups(mockGroupDaoImpl);
+        groupsSeeder = new GroupsSeeder(mockGroupDaoImpl);
     }
 
     @Test
     void generate_shouldCreateExactAmountOfGroupsWithCorrectFormat() {
 
-        initialGroups.generate();
+        groupsSeeder.generate(groupsAmount);
 
         verify(mockGroupDaoImpl, times(10)).save(any(Group.class));
     }

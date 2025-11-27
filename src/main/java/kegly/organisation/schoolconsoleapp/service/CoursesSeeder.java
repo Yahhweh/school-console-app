@@ -5,17 +5,17 @@ import kegly.organisation.schoolconsoleapp.entity.Course;
 
 import java.util.List;
 
-public class InitialCourses implements InitialData {
+public class CoursesSeeder implements Seeder {
 
-    CourseDaoImpl courseDaoImpl;
+    private CourseDaoImpl courseDaoImpl;
 
-    public InitialCourses(CourseDaoImpl courseDaoImpl) {
+    public CoursesSeeder(CourseDaoImpl courseDaoImpl) {
         this.courseDaoImpl = courseDaoImpl;
     }
 
     @Override
-    public void generate() {
-        List<String> SUBJECTS = List.of(
+    public void generate(int amount ) {
+        List<String> subjects = List.of(
             "Mathematics",
             "Physics",
             "Chemistry",
@@ -28,8 +28,8 @@ public class InitialCourses implements InitialData {
             "Computer Graphics"
         );
 
-        for (int i = 0; i < SUBJECTS.size(); i++) {
-            courseDaoImpl.save(new Course(SUBJECTS.get(i), generateDescription(SUBJECTS.get(i))));
+        for (int i = 0; i < amount; i++) {
+            courseDaoImpl.save(new Course(subjects.get(i), generateDescription(subjects.get(i))));
         }
     }
 

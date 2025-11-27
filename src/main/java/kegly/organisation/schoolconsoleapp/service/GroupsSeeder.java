@@ -5,18 +5,17 @@ import kegly.organisation.schoolconsoleapp.entity.Group;
 
 import java.util.Random;
 
-public class InitialGroups implements InitialData {
+public class GroupsSeeder implements Seeder {
 
     private final GroupDaoImpl groupDaoImpl;
 
-    public InitialGroups(GroupDaoImpl groupDaoImpl) {
+    public GroupsSeeder(GroupDaoImpl groupDaoImpl) {
         this.groupDaoImpl = groupDaoImpl;
     }
 
     @Override
-    public void generate() {
-        final int AMOUNT_OF_GROUPS = 10;
-        for (int i = 0; i < AMOUNT_OF_GROUPS; i++) {
+    public void generate(int amount) {
+        for (int i = 0; i < amount; i++) {
             Group group = new Group(generateString());
             groupDaoImpl.save(group);
         }

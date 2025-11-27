@@ -62,7 +62,7 @@ public class ConsoleMenu {
         } else {
             System.out.printf("%-10s %-20s%n", "ID", "NAME");
             System.out.println("------------------------------");
-            groups.forEach(g -> System.out.printf("%-10d %-20s%n", g.getGroup_id(), g.getGroup_name()));
+            groups.forEach(g -> System.out.printf("%-10d %-20s%n", g.getGroupId(), g.getGroupName()));
         }
     }
 

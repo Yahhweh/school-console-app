@@ -6,22 +6,24 @@ import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.*;
 
-class InitialStudentsToCoursesTest {
+class StudentsSeederToCoursesTest {
 
     StudentDaoImpl mockStudentDaoImpl;
-    InitialStudentsToCourses studentsToCourses;
+    StudentsToCoursesSeeder studentsToCourses;
+    private static final int studentsAmount = 200;
+
 
     @BeforeEach
     void setup() {
         mockStudentDaoImpl = mock(StudentDaoImpl.class);
-        studentsToCourses = new InitialStudentsToCourses(mockStudentDaoImpl);
+        studentsToCourses = new StudentsToCoursesSeeder(mockStudentDaoImpl);
     }
 
 
     @Test
     void generate_returnAtLeast210Connections_whenDataIsRight() {
 
-        studentsToCourses.generate();
+        studentsToCourses.generate(studentsAmount);
 
         verify(mockStudentDaoImpl, atLeast(210)).addCourseToStudent(any(Integer.class), any(Integer.class));
     }

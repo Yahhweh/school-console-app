@@ -38,10 +38,10 @@ class SchoolDataFacadeTest {
     @BeforeEach
     void setUp() {
         schoolDataFacade = new SchoolDataFacade();
-        injectMock("studentDao", studentDaoImpl);
-        injectMock("groupDao", groupDaoImpl);
-        injectMock("courseDao", courseDaoImpl);
-        injectMock("connectionClass", DBConnection);
+        injectMock("studentDaoImpl", studentDaoImpl);
+        injectMock("groupDaoImpl", groupDaoImpl);
+        injectMock("courseDaoImpl", courseDaoImpl);
+        injectMock("DBConnection", DBConnection);
     }
 
     private void injectMock(String fieldName, Object mock) {

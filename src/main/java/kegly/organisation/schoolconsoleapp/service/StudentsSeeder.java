@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 
-public class InitialStudents implements InitialData {
+public class StudentsSeeder implements Seeder {
 
     private final StudentDaoImpl studentDaoImpl;
     private final GroupDaoImpl groupDaoImpl;
 
-    public InitialStudents(StudentDaoImpl studentDaoImpl, GroupDaoImpl groupDaoImpl) {
+    public StudentsSeeder(StudentDaoImpl studentDaoImpl, GroupDaoImpl groupDaoImpl) {
         this.studentDaoImpl = studentDaoImpl;
         this.groupDaoImpl = groupDaoImpl;
     }
@@ -36,11 +36,10 @@ public class InitialStudents implements InitialData {
 
 
     @Override
-    public void generate() {
-        int AMOUNT_STUDENTS = 200;
+    public void generate(int amount) {
         Random random = new Random();
 
-        for (int i = 0; i < AMOUNT_STUDENTS; i++) {
+        for (int i = 0; i < amount; i++) {
             String firstName = FIRST_NAMES.get(random.nextInt(FIRST_NAMES.size()));
             String lastName = LAST_NAMES.get(random.nextInt(LAST_NAMES.size()));
 
@@ -48,15 +47,15 @@ public class InitialStudents implements InitialData {
         }
     }
 
-    public void assignRandomGroups() {
+    public void assignRandomGroups(int minStudents, int maxStudents) {
         List<Group> groups = groupDaoImpl.findAll();
 
         List<Student> allStudents = studentDaoImpl.findAll();
         Queue<Student> studentQueue = new ArrayDeque<>(allStudents);
 
+        //list of indexes latter
+
         Random random = new Random();
-        int minStudents = 10;
-        int maxStudents = 30;
 
         for (Group group : groups) {
             if (studentQueue.isEmpty()) {
@@ -72,7 +71,7 @@ public class InitialStudents implements InitialData {
 
                 Student student = studentQueue.poll();
 
-                studentDaoImpl.addIdGroups(student.getStudentId(), group.getGroup_id());
+                studentDaoImpl.addIdGroups(student.getStudentId(), group.getGroupId());
             }
         }
     }
