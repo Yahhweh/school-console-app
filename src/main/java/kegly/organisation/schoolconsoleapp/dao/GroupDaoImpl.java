@@ -11,9 +11,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GroupDaoImpl implements GroupDao{
+public class GroupDaoImpl implements GroupDao {
 
-    private DBConnection dBConnection;
+    private final DBConnection dBConnection;
 
     private static final String findAllSql = "SELECT * FROM groups";
     private static final String saveSql = "INSERT INTO groups(group_name) VALUES(?)";
@@ -24,13 +24,11 @@ public class GroupDaoImpl implements GroupDao{
 
     @Override
     public List<Group> findAll() {
-        try (Connection connection = dBConnection.getConnection()) {
+        List<Group> result = new ArrayList<>();
 
-            List<Group> result = new ArrayList<>();
-
-            PreparedStatement st = connection.prepareStatement(findAllSql);
-
-            ResultSet rs = st.executeQuery();
+        try (Connection connection = dBConnection.getConnection();
+             PreparedStatement st = connection.prepareStatement(findAllSql);
+             ResultSet rs = st.executeQuery()) {
 
             while (rs.next()) {
                 Integer groupId = rs.getObject("group_id", Integer.class);
@@ -47,17 +45,14 @@ public class GroupDaoImpl implements GroupDao{
 
     @Override
     public void save(Group group) {
-        try (Connection connection = dBConnection.getConnection()) {
-
-            PreparedStatement st = connection.prepareStatement(saveSql);
+        try (Connection connection = dBConnection.getConnection();
+             PreparedStatement st = connection.prepareStatement(saveSql)) {
 
             st.setString(1, group.getGroupName());
-
             st.executeUpdate();
 
-        } catch (SQLException exeption) {
-            throw new DaoException(exeption.getMessage());
+        } catch (SQLException exception) {
+            throw new DaoException(exception.getMessage());
         }
-
     }
 }

@@ -9,19 +9,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface StudentDao {
-    public void save(Student student);
+     void save(Student student);
 
-    public List<Student> findAll();
+     List<Student> findAll();
 
-    public void addCourseToStudent(int studentId, int courseId);
+     void addCourseToStudent(int studentId, int courseId);
 
-    public void addIdGroups(int student_id, int group_id);
+     void deleteById(int studentId);
 
-    public void deleteById(int studentId);
+     void removeStudentFromCourse(int studentId, int courseId);
 
-    public void removeStudentFromCourse(int studentId, int courseId);
+     List<Student> findStudentsByCourseName(String courseName);
 
-    public List<Student> findStudentsByCourseName(String courseName);
+     List<Group> findGroupsWithLessOrEqualStudents(int count);
 
-    public List<Group> findGroupsWithLessOrEqualStudents(int count);
+     void update(Student student);
 }

@@ -14,11 +14,7 @@ public class StudentsSeeder implements Seeder {
 
     private final StudentDaoImpl studentDaoImpl;
     private final GroupDaoImpl groupDaoImpl;
-
-    public StudentsSeeder(StudentDaoImpl studentDaoImpl, GroupDaoImpl groupDaoImpl) {
-        this.studentDaoImpl = studentDaoImpl;
-        this.groupDaoImpl = groupDaoImpl;
-    }
+    private final Random random = new Random();
 
     private static final List<String> FIRST_NAMES = List.of(
         "Liam", "Noah", "Oliver", "Elijah", "James",
@@ -34,28 +30,26 @@ public class StudentsSeeder implements Seeder {
         "Thomas", "Taylor", "Moore", "Jackson", "Martin"
     );
 
+    public StudentsSeeder(StudentDaoImpl studentDaoImpl, GroupDaoImpl groupDaoImpl) {
+        this.studentDaoImpl = studentDaoImpl;
+        this.groupDaoImpl = groupDaoImpl;
+    }
 
     @Override
     public void generate(int amount) {
-        Random random = new Random();
-
         for (int i = 0; i < amount; i++) {
             String firstName = FIRST_NAMES.get(random.nextInt(FIRST_NAMES.size()));
             String lastName = LAST_NAMES.get(random.nextInt(LAST_NAMES.size()));
 
-            studentDaoImpl.save(new Student(null, firstName, lastName));
+            studentDaoImpl.save(new Student(null, null, firstName, lastName));
         }
     }
 
     public void assignRandomGroups(int minStudents, int maxStudents) {
         List<Group> groups = groupDaoImpl.findAll();
-
         List<Student> allStudents = studentDaoImpl.findAll();
+
         Queue<Student> studentQueue = new ArrayDeque<>(allStudents);
-
-        //list of indexes latter
-
-        Random random = new Random();
 
         for (Group group : groups) {
             if (studentQueue.isEmpty()) {
@@ -71,7 +65,9 @@ public class StudentsSeeder implements Seeder {
 
                 Student student = studentQueue.poll();
 
-                studentDaoImpl.addIdGroups(student.getStudentId(), group.getGroupId());
+                if (student != null) {
+                    studentDaoImpl.update(student);
+                }
             }
         }
     }

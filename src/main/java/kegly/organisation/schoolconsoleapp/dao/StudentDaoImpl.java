@@ -9,13 +9,13 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StudentDaoImpl implements  StudentDao{
+public class StudentDaoImpl implements StudentDao {
 
     private final DBConnection DBConnection;
     private static final String saveSql = "INSERT INTO students (group_id, first_name, last_name) VALUES (?, ?, ?)";
     private static final String findAllSql ="SELECT * FROM students";
     private static final String addCourseToStudentSql = "Insert INTO student_courses(student_id, course_id) VALUES(?, ?)";
-    private static final String addIdGroupsSql = "UPDATE students SET group_id = ? WHERE(student_id = ?)";
+    private static final String updateSql = "UPDATE students SET group_id = ?, first_name = ?, last_name = ?";
     private static final String deleteByIdSql = "DELETE FROM students WHERE student_id = ?";
     private static final String removeStudentFromCourseSql = "DELETE FROM student_courses WHERE student_id = ? AND course_id = ?";
     private static final String findStudentsByCourseNameSql = """
@@ -84,21 +84,6 @@ public class StudentDaoImpl implements  StudentDao{
 
             statement.setObject(1, studentId, Types.INTEGER);
             statement.setObject(2, courseId, Types.INTEGER);
-
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new DaoException(e.getMessage());
-        }
-    }
-
-
-    @Override
-    public void addIdGroups(int student_id, int group_id) {
-
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(addIdGroupsSql)) {
-            statement.setObject(1, group_id, Types.INTEGER);
-            statement.setObject(2, student_id, Types.INTEGER);
 
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -186,4 +171,19 @@ public class StudentDaoImpl implements  StudentDao{
         }
         return groups;
     }
+
+    @Override
+    public void update(Student student) {
+        try (Connection connection = DBConnection.getConnection(); PreparedStatement statement = connection.prepareStatement(updateSql)) {
+            statement.setObject(1, student.getGroupId(), Types.INTEGER);
+            statement.setString(2, student.getFirstName());
+            statement.setString(3, student.getLastName());
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DaoException(e.getMessage());
+        }
+    }
+
+
 }
