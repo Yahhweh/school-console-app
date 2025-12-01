@@ -1,11 +1,7 @@
 package kegly.organisation.schoolconsoleapp.dao;
 
-import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
-import kegly.organisation.schoolconsoleapp.exception.DaoException;
 
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public interface StudentDao {
@@ -21,7 +17,5 @@ public interface StudentDao {
 
      List<Student> findStudentsByCourseName(String courseName);
 
-     List<Group> findGroupsWithLessOrEqualStudents(int count);
-
-     void update(Student student);
+    void update(Student student);
 }

@@ -1,6 +1,6 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.CourseDaoImpl;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.CourseJdbc;
 import kegly.organisation.schoolconsoleapp.entity.Course;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,24 +11,24 @@ import static org.mockito.Mockito.*;
 
 public class CoursesSeederTest {
 
-    private CourseDaoImpl mockCourseDaoImpl;
+    private CourseJdbc mockCourseJdbc;
     private CoursesSeeder coursesSeeder;
     private static final int coursesAmount = 10;
 
     @BeforeEach
     void setup() {
-        mockCourseDaoImpl = mock(CourseDaoImpl.class);
-        coursesSeeder = new CoursesSeeder(mockCourseDaoImpl);
+        mockCourseJdbc = mock(CourseJdbc.class);
+        coursesSeeder = new CoursesSeeder(mockCourseJdbc);
     }
 
     @Test
     void generate_shouldCreateExactAmountOfCourses_whenCorrectData() {
 
-        when(mockCourseDaoImpl.findAll()).thenReturn(List.of());
+        when(mockCourseJdbc.findAll()).thenReturn(List.of());
 
         coursesSeeder.generate(coursesAmount);
 
-        verify(mockCourseDaoImpl, times(10)).save(any(Course.class));
+        verify(mockCourseJdbc, times(10)).save(any(Course.class));
     }
 
 }

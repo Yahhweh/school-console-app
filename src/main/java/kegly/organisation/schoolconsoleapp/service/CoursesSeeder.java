@@ -1,16 +1,16 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.CourseDaoImpl;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.CourseJdbc;
 import kegly.organisation.schoolconsoleapp.entity.Course;
 
 import java.util.List;
 
 public class CoursesSeeder implements Seeder {
 
-    private CourseDaoImpl courseDaoImpl;
+    private CourseJdbc courseJdbc;
 
-    public CoursesSeeder(CourseDaoImpl courseDaoImpl) {
-        this.courseDaoImpl = courseDaoImpl;
+    public CoursesSeeder(CourseJdbc courseJdbc) {
+        this.courseJdbc = courseJdbc;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class CoursesSeeder implements Seeder {
         );
 
         for (int i = 0; i < amount; i++) {
-            courseDaoImpl.save(new Course(subjects.get(i), generateDescription(subjects.get(i))));
+            courseJdbc.save(new Course(subjects.get(i), generateDescription(subjects.get(i))));
         }
     }
 

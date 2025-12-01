@@ -1,7 +1,7 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.GroupDaoImpl;
-import kegly.organisation.schoolconsoleapp.dao.StudentDaoImpl;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.GroupJdbc;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.StudentJdbc;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
 
@@ -12,8 +12,8 @@ import java.util.Random;
 
 public class StudentsSeeder implements Seeder {
 
-    private final StudentDaoImpl studentDaoImpl;
-    private final GroupDaoImpl groupDaoImpl;
+    private final StudentJdbc studentJdbc;
+    private final GroupJdbc groupJdbc;
     private final Random random = new Random();
 
     private static final List<String> FIRST_NAMES = List.of(
@@ -30,9 +30,9 @@ public class StudentsSeeder implements Seeder {
         "Thomas", "Taylor", "Moore", "Jackson", "Martin"
     );
 
-    public StudentsSeeder(StudentDaoImpl studentDaoImpl, GroupDaoImpl groupDaoImpl) {
-        this.studentDaoImpl = studentDaoImpl;
-        this.groupDaoImpl = groupDaoImpl;
+    public StudentsSeeder(StudentJdbc studentJdbc, GroupJdbc groupJdbc) {
+        this.studentJdbc = studentJdbc;
+        this.groupJdbc = groupJdbc;
     }
 
     @Override
@@ -41,13 +41,13 @@ public class StudentsSeeder implements Seeder {
             String firstName = FIRST_NAMES.get(random.nextInt(FIRST_NAMES.size()));
             String lastName = LAST_NAMES.get(random.nextInt(LAST_NAMES.size()));
 
-            studentDaoImpl.save(new Student(null, null, firstName, lastName));
+            studentJdbc.save(new Student(null, null, firstName, lastName));
         }
     }
 
     public void assignRandomGroups(int minStudents, int maxStudents) {
-        List<Group> groups = groupDaoImpl.findAll();
-        List<Student> allStudents = studentDaoImpl.findAll();
+        List<Group> groups = groupJdbc.findAll();
+        List<Student> allStudents = studentJdbc.findAll();
 
         Queue<Student> studentQueue = new ArrayDeque<>(allStudents);
 
@@ -66,7 +66,7 @@ public class StudentsSeeder implements Seeder {
                 Student student = studentQueue.poll();
 
                 if (student != null) {
-                    studentDaoImpl.update(student);
+                    studentJdbc.update(student);
                 }
             }
         }

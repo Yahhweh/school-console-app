@@ -1,8 +1,8 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.CourseDaoImpl;
-import kegly.organisation.schoolconsoleapp.dao.GroupDaoImpl;
-import kegly.organisation.schoolconsoleapp.dao.StudentDaoImpl;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.CourseJdbc;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.GroupJdbc;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.StudentJdbc;
 import kegly.organisation.schoolconsoleapp.db.DBConnection;
 import kegly.organisation.schoolconsoleapp.db.SchemaLoader;
 import kegly.organisation.schoolconsoleapp.entity.Group;
@@ -16,9 +16,9 @@ import java.util.List;
 public class SchoolDataFacade {
 
     private final DBConnection DBConnection;
-    private final StudentDaoImpl studentDaoImpl;
-    private final GroupDaoImpl groupDaoImpl;
-    private final CourseDaoImpl courseDaoImpl;
+    private final StudentJdbc studentJdbc;
+    private final GroupJdbc groupJdbc;
+    private final CourseJdbc courseJdbc;
     private static final String initialSql = "schema.sql";
     private static final int coursesAmount = 10;
     private static final int groupsAmount = 10;
@@ -28,9 +28,9 @@ public class SchoolDataFacade {
 
     public SchoolDataFacade() {
         this.DBConnection = new DBConnection();
-        this.studentDaoImpl = new StudentDaoImpl(DBConnection);
-        this.groupDaoImpl = new GroupDaoImpl(DBConnection);
-        this.courseDaoImpl = new CourseDaoImpl(DBConnection);
+        this.studentJdbc = new StudentJdbc(DBConnection);
+        this.groupJdbc = new GroupJdbc(DBConnection);
+        this.courseJdbc = new CourseJdbc(DBConnection);
     }
 
     public void initializeDatabase() {
@@ -39,15 +39,15 @@ public class SchoolDataFacade {
             new SchemaLoader().runScript(connection, initialSql);
 
             System.out.println("Generating data");
-            new CoursesSeeder(courseDaoImpl).generate(coursesAmount);
-            new GroupsSeeder(groupDaoImpl).generate(groupsAmount);
-            StudentsSeeder studentsSeeder = new StudentsSeeder(studentDaoImpl, groupDaoImpl);
+            new CoursesSeeder(courseJdbc).generate(coursesAmount);
+            new GroupsSeeder(groupJdbc).generate(groupsAmount);
+            StudentsSeeder studentsSeeder = new StudentsSeeder(studentJdbc, groupJdbc);
             studentsSeeder.generate(studentsAmount);
             studentsSeeder.assignRandomGroups(10, 30);
 
             new StudentsToCoursesSeeder(
-                studentDaoImpl,
-                courseDaoImpl,
+                studentJdbc,
+                courseJdbc,
                 MIN_COURSES_PER_STUDENT,
                 MAX_COURSES_PER_STUDENT
             ).generate(studentsAmount);
@@ -60,26 +60,26 @@ public class SchoolDataFacade {
     }
 
     public List<Group> findGroupsWithLessOrEqualStudents(int count) {
-        return studentDaoImpl.findGroupsWithLessOrEqualStudents(count);
+        return groupJdbc.findGroupsWithLessOrEqualStudents(count);
     }
 
     public List<Student> findStudentsByCourseName(String courseName) {
-        return studentDaoImpl.findStudentsByCourseName(courseName);
+        return studentJdbc.findStudentsByCourseName(courseName);
     }
 
     public void addNewStudent(String firstName, String lastName, Integer groupId) {
-        studentDaoImpl.save(new Student(groupId, firstName, lastName));
+        studentJdbc.save(new Student(groupId, firstName, lastName));
     }
 
     public void deleteStudentById(int studentId) {
-        studentDaoImpl.deleteById(studentId);
+        studentJdbc.deleteById(studentId);
     }
 
     public void addStudentToCourse(int studentId, int courseId) {
-        studentDaoImpl.addCourseToStudent(studentId, courseId);
+        studentJdbc.addCourseToStudent(studentId, courseId);
     }
 
     public void removeStudentFromCourse(int studentId, int courseId) {
-        studentDaoImpl.removeStudentFromCourse(studentId, courseId);
+        studentJdbc.removeStudentFromCourse(studentId, courseId);
     }
 }

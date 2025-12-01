@@ -1,7 +1,7 @@
-package kegly.organisation.schoolconsoleapp.dao;
+package kegly.organisation.schoolconsoleapp.dao.jdbc;
 
+import kegly.organisation.schoolconsoleapp.dao.StudentDao;
 import kegly.organisation.schoolconsoleapp.db.DBConnection;
-import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
 import kegly.organisation.schoolconsoleapp.exception.DaoException;
 
@@ -9,15 +9,17 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StudentDaoImpl implements StudentDao {
+public class StudentJdbc implements StudentDao {
 
     private final DBConnection DBConnection;
-    private static final String saveSql = "INSERT INTO students (group_id, first_name, last_name) VALUES (?, ?, ?)";
-    private static final String findAllSql ="SELECT * FROM students";
-    private static final String addCourseToStudentSql = "Insert INTO student_courses(student_id, course_id) VALUES(?, ?)";
-    private static final String updateSql = "UPDATE students SET group_id = ?, first_name = ?, last_name = ?";
-    private static final String deleteByIdSql = "DELETE FROM students WHERE student_id = ?";
-    private static final String removeStudentFromCourseSql = "DELETE FROM student_courses WHERE student_id = ? AND course_id = ?";
+
+    private static final String SAVE_SQL = "INSERT INTO students (group_id, first_name, last_name) VALUES (?, ?, ?)";
+    private static final String FIND_ALL_SQL = "SELECT * FROM students";
+    private static final String ADD_COURSE_TO_STUDENT_SQL = "INSERT INTO student_courses(student_id, course_id) VALUES(?, ?)";
+    private static final String UPDATE_SQL = "UPDATE students SET group_id = ?, first_name = ?, last_name = ?";
+    private static final String DELETE_BY_ID_SQL = "DELETE FROM students WHERE student_id = ?";
+    private static final String REMOVE_STUDENT_FROM_COURSE_SQL = "DELETE FROM student_courses WHERE student_id = ? AND course_id = ?";
+
     private static final String findStudentsByCourseNameSql = """
     SELECT s.student_id, s.group_id, s.first_name, s.last_name
     FROM students s
@@ -25,15 +27,8 @@ public class StudentDaoImpl implements StudentDao {
     JOIN courses c ON sc.course_id = c.course_id
     WHERE c.course_name = ?
 """;
-    private static final String findGroupsWithLessOrEqualStudentsSql = """
-    SELECT g.group_id, g.group_name
-    FROM groups g
-    LEFT JOIN students s ON g.group_id = s.group_id
-    GROUP BY g.group_id, g.group_name
-    HAVING COUNT(s.student_id) <= ?
-""";
 
-    public StudentDaoImpl(DBConnection DBConnection) {
+    public StudentJdbc(DBConnection DBConnection) {
         this.DBConnection = DBConnection;
     }
 
@@ -41,7 +36,7 @@ public class StudentDaoImpl implements StudentDao {
     public void save(Student student) {
 
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(saveSql)) {
+             PreparedStatement statement = connection.prepareStatement(SAVE_SQL)) {
 
             statement.setObject(1, student.getGroupId(), Types.INTEGER);
             statement.setString(2, student.getFirstName());
@@ -59,7 +54,7 @@ public class StudentDaoImpl implements StudentDao {
         List<Student> students = new ArrayList<>();
 
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(findAllSql);
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL_SQL);
              ResultSet rs = statement.executeQuery()) {
 
             while (rs.next()) {
@@ -80,7 +75,7 @@ public class StudentDaoImpl implements StudentDao {
     @Override
     public void addCourseToStudent(int studentId, int courseId) {
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(addCourseToStudentSql)) {
+             PreparedStatement statement = connection.prepareStatement(ADD_COURSE_TO_STUDENT_SQL)) {
 
             statement.setObject(1, studentId, Types.INTEGER);
             statement.setObject(2, courseId, Types.INTEGER);
@@ -94,7 +89,7 @@ public class StudentDaoImpl implements StudentDao {
     public void deleteById(int studentId) {
 
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(deleteByIdSql)) {
+             PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID_SQL)) {
 
             statement.setInt(1, studentId);
             int rowsAffected = statement.executeUpdate();
@@ -112,7 +107,7 @@ public class StudentDaoImpl implements StudentDao {
     public void removeStudentFromCourse(int studentId, int courseId) {
 
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(removeStudentFromCourseSql)) {
+             PreparedStatement statement = connection.prepareStatement(REMOVE_STUDENT_FROM_COURSE_SQL)) {
 
             statement.setInt(1, studentId);
             statement.setInt(2, courseId);
@@ -151,30 +146,8 @@ public class StudentDaoImpl implements StudentDao {
     }
 
     @Override
-    public List<Group> findGroupsWithLessOrEqualStudents(int count) {
-        List<Group> groups = new ArrayList<>();
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement st = connection.prepareStatement(findGroupsWithLessOrEqualStudentsSql)) {
-
-            st.setInt(1, count);
-
-            try (ResultSet resultSet = st.executeQuery()) {
-                while (resultSet.next()) {
-                    groups.add(new Group(
-                        resultSet.getInt("group_id"),
-                        resultSet.getString("group_name")
-                    ));
-                }
-            }
-        } catch (SQLException e) {
-            throw new DaoException("Failed to find groups with student count constraint", e);
-        }
-        return groups;
-    }
-
-    @Override
     public void update(Student student) {
-        try (Connection connection = DBConnection.getConnection(); PreparedStatement statement = connection.prepareStatement(updateSql)) {
+        try (Connection connection = DBConnection.getConnection(); PreparedStatement statement = connection.prepareStatement(UPDATE_SQL)) {
             statement.setObject(1, student.getGroupId(), Types.INTEGER);
             statement.setString(2, student.getFirstName());
             statement.setString(3, student.getLastName());

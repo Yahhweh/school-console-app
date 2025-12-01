@@ -1,25 +1,28 @@
 package kegly.organisation.schoolconsoleapp.dao;
 
+import kegly.organisation.schoolconsoleapp.dao.jdbc.GroupJdbc;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.StudentJdbc;
 import kegly.organisation.schoolconsoleapp.db.DBConnection;
 import kegly.organisation.schoolconsoleapp.db.SchemaLoader;
 import kegly.organisation.schoolconsoleapp.entity.Group;
+import kegly.organisation.schoolconsoleapp.entity.Student;
 import kegly.organisation.schoolconsoleapp.exception.DaoException;
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.swing.plaf.nimbus.State;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class GroupDaoImplTest {
+class GroupJdbcTest {
 
     private DBConnection dBConnection;
-    private GroupDaoImpl groupDaoImpl;
+    private GroupJdbc groupJdbc;
+    private StudentJdbc studentJdbc;
     private static final String dropAll = "DROP ALL OBJECTS";
 
     @BeforeEach
@@ -30,7 +33,8 @@ class GroupDaoImplTest {
                 return super.getTestConnection();
             }
         };
-        groupDaoImpl = new GroupDaoImpl(dBConnection);
+        groupJdbc = new GroupJdbc(dBConnection);
+        studentJdbc = new StudentJdbc(dBConnection);
         final String initialSql = "schema.sql";
 
         try (Connection conn = dBConnection.getConnection();
@@ -48,7 +52,7 @@ class GroupDaoImplTest {
     void getGroups_returnGroups_whenRightConnection() {
         List<Group> expected = List.of();
 
-        List<Group> result = groupDaoImpl.findAll();
+        List<Group> result = groupJdbc.findAll();
 
         assertEquals(expected, result);
 
@@ -61,13 +65,37 @@ class GroupDaoImplTest {
 
         List<Group> expected = List.of(new Group(1, testGroupName));
 
-        groupDaoImpl.save(newGroup);
+        groupJdbc.save(newGroup);
 
-        List<Group> result = groupDaoImpl.findAll();
+        List<Group> result = groupJdbc.findAll();
 
         assertEquals(expected,result);
+    }
 
+    @Test
+    void findGroupsWithLessOrEqualStudents_returnsFilteredGroups_whenTwoStudents() {
+        try (Connection connection = dBConnection.getConnection();
+             PreparedStatement st1 = connection.prepareStatement("INSERT INTO groups (group_id, group_name) VALUES (100, 'Group A')");
+             PreparedStatement st2 = connection.prepareStatement("INSERT INTO groups (group_id, group_name) VALUES (200, 'Group B')")) {
 
+            st1.executeUpdate();
+            st2.executeUpdate();
+        } catch (SQLException e) {
+            throw new DaoException(e.getMessage());
+        }
+
+        Student s1 = new Student(1, 100, "Student", "One");
+        Student s2 = new Student(2, 100, "Student", "Two");
+        Student s3 = new Student(3, 200, "Student", "Three");
+
+        studentJdbc.save(s1);
+        studentJdbc.save(s2);
+        studentJdbc .save(s3);
+
+        List<Group> result = groupJdbc.findGroupsWithLessOrEqualStudents(1);
+
+        assertEquals(1, result.size());
+        assertEquals("Group B", result.get(0).getGroupName());
     }
     }
 

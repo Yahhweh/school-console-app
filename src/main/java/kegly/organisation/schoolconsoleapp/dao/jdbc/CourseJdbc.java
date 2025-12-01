@@ -1,32 +1,37 @@
-package kegly.organisation.schoolconsoleapp.dao;
+package kegly.organisation.schoolconsoleapp.dao.jdbc;
 
+import kegly.organisation.schoolconsoleapp.dao.CourseDao;
 import kegly.organisation.schoolconsoleapp.db.DBConnection;
 import kegly.organisation.schoolconsoleapp.entity.Course;
 import kegly.organisation.schoolconsoleapp.exception.DaoException;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CourseDaoImpl implements  CourseDao {
+public class CourseJdbc implements CourseDao {
 
-    private final DBConnection DBConnection;
+    final String FIND_COURSES_BY_STUDENT_ID_SQL = "SELECT course_id FROM student_courses WHERE (studentId = ?)";
+    final String FIND_SQL = "SELECT * FROM courses";
+    final String SAVE_SQL = "INSERT INTO courses(course_name, course_description) VALUES (?, ?)";
 
-    private static final String findAllSql = "SELECT * FROM courses";
-    private static final String saveSql = "INSERT INTO courses(course_name, course_description) VALUES (?, ?)";
-    private static final String findCoursesByStudentIdSql = "SELECT course_id FROM student_courses WHERE (studentId = ?)";
+    private final DBConnection dBConnection;
 
-    public CourseDaoImpl(DBConnection DBConnection) {
-        this.DBConnection = DBConnection;
+    public CourseJdbc(DBConnection DBConnection) {
+        this.dBConnection = DBConnection;
     }
 
     @Override
     public List<Course> findAll() {
-        try (Connection connection = DBConnection.getConnection()) {
+
+        try (Connection connection = dBConnection.getConnection()) {
 
             List<Course> result = new ArrayList<>();
 
-            PreparedStatement st = connection.prepareStatement(findAllSql);
+            PreparedStatement st = connection.prepareStatement(FIND_SQL);
 
             ResultSet rs = st.executeQuery();
 
@@ -45,9 +50,9 @@ public class CourseDaoImpl implements  CourseDao {
 
     @Override
     public void save(Course course) {
-        try (Connection connection = DBConnection.getConnection()) {
+        try (Connection connection = dBConnection.getConnection()) {
 
-            PreparedStatement st = connection.prepareStatement(saveSql, PreparedStatement.RETURN_GENERATED_KEYS);
+            PreparedStatement st = connection.prepareStatement(SAVE_SQL, PreparedStatement.RETURN_GENERATED_KEYS);
 
             st.setString(1, course.getCourseName());
             st.setString(2, course.getCourseDescription());
@@ -69,10 +74,19 @@ public class CourseDaoImpl implements  CourseDao {
 
     @Override
     public List<Course> findCoursesByStudentId(int studentId) {
-        List<Course> result = new ArrayList<>();
+        try (Connection connection = dBConnection.getConnection();) {
 
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(findCoursesByStudentIdSql);) {
+            PreparedStatement statement = connection.prepareStatement(FIND_COURSES_BY_STUDENT_ID_SQL);
+            List<Course> result = createResultSet(statement);
+            return result;
+        } catch (SQLException e) {
+            throw new DaoException(e.getMessage());
+        }
+    }
+
+    private List<Course> createResultSet(PreparedStatement statement) {
+        List<Course> result = new ArrayList<>();
+        try {
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 Integer courseId = rs.getObject("course_id", Integer.class);
@@ -80,10 +94,9 @@ public class CourseDaoImpl implements  CourseDao {
                 String courseDescription = rs.getString("course_description");
                 result.add(new Course(courseId, courseName, courseDescription));
             }
-            return result;
         } catch (SQLException e) {
             throw new DaoException(e.getMessage());
         }
-
+        return result;
     }
 }

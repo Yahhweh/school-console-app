@@ -1,23 +1,23 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.GroupDaoImpl;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.GroupJdbc;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 
 import java.util.Random;
 
 public class GroupsSeeder implements Seeder {
 
-    private final GroupDaoImpl groupDaoImpl;
+    private final GroupJdbc groupJdbc;
 
-    public GroupsSeeder(GroupDaoImpl groupDaoImpl) {
-        this.groupDaoImpl = groupDaoImpl;
+    public GroupsSeeder(GroupJdbc groupJdbc) {
+        this.groupJdbc = groupJdbc;
     }
 
     @Override
     public void generate(int amount) {
         for (int i = 0; i < amount; i++) {
             Group group = new Group(generateString());
-            groupDaoImpl.save(group);
+            groupJdbc.save(group);
         }
     }
 

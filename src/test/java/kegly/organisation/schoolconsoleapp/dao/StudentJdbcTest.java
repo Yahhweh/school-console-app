@@ -1,8 +1,8 @@
 package kegly.organisation.schoolconsoleapp.dao;
 
+import kegly.organisation.schoolconsoleapp.dao.jdbc.StudentJdbc;
 import kegly.organisation.schoolconsoleapp.db.DBConnection;
 import kegly.organisation.schoolconsoleapp.db.SchemaLoader;
-import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
 import kegly.organisation.schoolconsoleapp.exception.DaoException;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,10 +16,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class StudentDaoImplTest {
+class StudentJdbcTest {
 
     private DBConnection dBConnection;
-    private StudentDaoImpl studentDaoImpl;
+    private StudentJdbc studentJdbc;
     private static final String DROP_ALL = "DROP ALL OBJECTS";
 
     @BeforeEach
@@ -30,7 +30,7 @@ class StudentDaoImplTest {
                 return super.getTestConnection();
             }
         };
-        studentDaoImpl = new StudentDaoImpl(dBConnection);
+        studentJdbc = new StudentJdbc(dBConnection);
 
         final String initialSql = "schema.sql";
 
@@ -49,7 +49,7 @@ class StudentDaoImplTest {
     void findAll_returnStudents_whenRightConnection() {
         List<Student> expected = List.of();
 
-        List<Student> result = studentDaoImpl.findAll();
+        List<Student> result = studentJdbc.findAll();
 
         assertEquals(expected, result);
     }
@@ -63,38 +63,11 @@ class StudentDaoImplTest {
         Student newStudent = new Student(expectedId, null, firstName, lastName);
 
         List<Student> expected = List.of(newStudent);
-        studentDaoImpl.save(newStudent);
-        List<Student> result = studentDaoImpl.findAll();
+        studentJdbc.save(newStudent);
+        List<Student> result = studentJdbc.findAll();
 
         assertEquals(expected, result);
     }
-
-    @Test
-    void findGroupsWithLessOrEqualStudents_returnsFilteredGroups_whenTwoStudents() {
-        try (Connection connection = dBConnection.getConnection();
-             PreparedStatement st1 = connection.prepareStatement("INSERT INTO groups (group_id, group_name) VALUES (100, 'Group A')");
-             PreparedStatement st2 = connection.prepareStatement("INSERT INTO groups (group_id, group_name) VALUES (200, 'Group B')")) {
-
-            st1.executeUpdate();
-            st2.executeUpdate();
-        } catch (SQLException e) {
-            throw new DaoException(e.getMessage());
-        }
-
-        Student s1 = new Student(1, 100, "Student", "One");
-        Student s2 = new Student(2, 100, "Student", "Two");
-        Student s3 = new Student(3, 200, "Student", "Three");
-
-        studentDaoImpl.save(s1);
-        studentDaoImpl.save(s2);
-        studentDaoImpl.save(s3);
-
-        List<Group> result = studentDaoImpl.findGroupsWithLessOrEqualStudents(1);
-
-        assertEquals(1, result.size());
-        assertEquals("Group B", result.get(0).getGroupName());
-    }
-
 
     @Test
     void update_updatesStudentGroupId_whenGroupExists() {
@@ -105,11 +78,11 @@ class StudentDaoImplTest {
             throw new DaoException(e.getMessage());
         }
         Student student = new Student(1, 300, "Tom", "Hanks");
-        studentDaoImpl.save(student);
+        studentJdbc.save(student);
 
-        studentDaoImpl.update(student);
+        studentJdbc.update(student);
 
-        List<Student> students = studentDaoImpl.findAll();
+        List<Student> students = studentJdbc.findAll();
         Student updatedStudent = students.stream()
             .filter(s -> s.getStudentId() == 1)
             .findFirst()
@@ -127,11 +100,11 @@ class StudentDaoImplTest {
             throw new DaoException(e.getMessage());
         }
         Student student = new Student(1, null, "Tom", "Hanks");
-        studentDaoImpl.save(student);
+        studentJdbc.save(student);
 
-        studentDaoImpl.deleteById(student.getStudentId());
+        studentJdbc.deleteById(student.getStudentId());
 
-        List<Student> expected = studentDaoImpl.findAll();
+        List<Student> expected = studentJdbc.findAll();
 
         List<Student> result = List.of();
 
@@ -148,12 +121,12 @@ class StudentDaoImplTest {
         }
 
         Student student = new Student(1, null, "Tom", "Hanks");
-        studentDaoImpl.save(student);
-        studentDaoImpl.addCourseToStudent(1, 50);
+        studentJdbc.save(student);
+        studentJdbc.addCourseToStudent(1, 50);
 
-        studentDaoImpl.removeStudentFromCourse(1, 50);
+        studentJdbc.removeStudentFromCourse(1, 50);
 
-        List<Student> result = studentDaoImpl.findStudentsByCourseName("Biology");
+        List<Student> result = studentJdbc.findStudentsByCourseName("Biology");
         List<Student> expected = List.of();
 
         assertEquals(expected, result);

@@ -1,5 +1,6 @@
 package kegly.organisation.schoolconsoleapp.dao;
 
+import kegly.organisation.schoolconsoleapp.dao.jdbc.CourseJdbc;
 import kegly.organisation.schoolconsoleapp.db.DBConnection;
 import kegly.organisation.schoolconsoleapp.db.SchemaLoader;
 import kegly.organisation.schoolconsoleapp.entity.Course;
@@ -12,10 +13,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class CourseDaoImplTest {
+class CourseJdbcTest {
 
     private DBConnection dbConnection;
-    private CourseDaoImpl courseDaoImpl;
+    private CourseJdbc courseJdbc;
     private static final String dropAll = "DROP ALL OBJECTS";
 
     @BeforeEach
@@ -26,7 +27,7 @@ class CourseDaoImplTest {
                 return super.getTestConnection();
             }
         };
-        courseDaoImpl = new CourseDaoImpl(dbConnection);
+        courseJdbc = new CourseJdbc(dbConnection);
         final String initialSql = "schema.sql";
 
         try (Connection conn = dbConnection.getConnection();
@@ -44,7 +45,7 @@ class CourseDaoImplTest {
     void findAll_returnCourses_whenRightConnection() {
         List<Course> expected = List.of();
 
-        List<Course> result = courseDaoImpl.findAll();
+        List<Course> result = courseJdbc.findAll();
 
         assertEquals(expected, result);
 
@@ -60,9 +61,9 @@ class CourseDaoImplTest {
 
         List<Course> expected = List.of(new Course(testId,testCourseName, testCourseDescription));
 
-        courseDaoImpl.save(newCourse);
+        courseJdbc.save(newCourse);
 
-        List<Course> result = courseDaoImpl.findAll();
+        List<Course> result = courseJdbc.findAll();
 
         assertEquals(expected,result);
     }
