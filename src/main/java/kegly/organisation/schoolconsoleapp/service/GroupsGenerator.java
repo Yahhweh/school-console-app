@@ -1,29 +1,29 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.jdbc.GroupJdbc;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcGroup;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 
 import java.util.Random;
 
-public class GroupsSeeder implements Seeder {
+public class GroupsGenerator implements Seeder {
 
-    private final GroupJdbc groupJdbc;
+    private final static int ALPHABET_SIZE = 26;
+    private final static int RANDOM_NUMBER_LIMIT = 10;
+    private final JdbcGroup jdbcGroup;
 
-    public GroupsSeeder(GroupJdbc groupJdbc) {
-        this.groupJdbc = groupJdbc;
+    public GroupsGenerator(JdbcGroup jdbcGroup) {
+        this.jdbcGroup = jdbcGroup;
     }
 
     @Override
     public void generate(int amount) {
         for (int i = 0; i < amount; i++) {
-            Group group = new Group(generateString());
-            groupJdbc.save(group);
+            Group group = new Group(generateGroupName());
+            jdbcGroup.save(group);
         }
     }
 
-    static String generateString() {
-        final int ALPHABET_SIZE = 26;
-        final int RANDOM_NUMBER_LIMIT = 10;
+    private String generateGroupName() {
 
         Random random = new Random();
 

@@ -1,4 +1,4 @@
-package kegly.organisation.schoolconsoleapp.exception;
+package kegly.organisation.schoolconsoleapp.db;
 
 public class DBException extends RuntimeException {
 

@@ -1,28 +1,28 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.jdbc.GroupJdbc;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcGroup;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.*;
 
-public class GroupsSeederTest {
+public class GroupsGeneratorTest {
 
-    private GroupJdbc mockGroupJdbc;
-    private GroupsSeeder groupsSeeder;
+    private JdbcGroup mockJdbcGroup;
+    private GroupsGenerator groupsGenerator;
     private static final int groupsAmount = 10;
     @BeforeEach
     void setup() {
-        mockGroupJdbc = mock(GroupJdbc.class);
-        groupsSeeder = new GroupsSeeder(mockGroupJdbc);
+        mockJdbcGroup = mock(JdbcGroup.class);
+        groupsGenerator = new GroupsGenerator(mockJdbcGroup);
     }
 
     @Test
     void generate_shouldCreateExactAmountOfGroupsWithCorrectFormat() {
 
-        groupsSeeder.generate(groupsAmount);
+        groupsGenerator.generate(groupsAmount);
 
-        verify(mockGroupJdbc, times(10)).save(any(Group.class));
+        verify(mockJdbcGroup, times(10)).save(any(Group.class));
     }
 }

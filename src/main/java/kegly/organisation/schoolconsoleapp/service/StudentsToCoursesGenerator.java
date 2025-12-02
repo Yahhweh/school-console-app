@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class StudentsToCoursesSeeder implements Seeder {
+public class StudentsToCoursesGenerator implements Seeder {
 
     private final StudentDao studentDao;
     private final CourseDao courseDao;
@@ -18,10 +18,10 @@ public class StudentsToCoursesSeeder implements Seeder {
     private final int maxCoursesPerStudent;
     private final Random random;
 
-    public StudentsToCoursesSeeder(StudentDao studentDao,
-                                   CourseDao courseDao,
-                                   int minCoursesPerStudent,
-                                   int maxCoursesPerStudent) {
+    public StudentsToCoursesGenerator(StudentDao studentDao,
+                                      CourseDao courseDao,
+                                      int minCoursesPerStudent,
+                                      int maxCoursesPerStudent) {
         this.studentDao = studentDao;
         this.courseDao = courseDao;
         this.minCoursesPerStudent = minCoursesPerStudent;
@@ -40,7 +40,7 @@ public class StudentsToCoursesSeeder implements Seeder {
         }
 
         List<Integer> allCourseIds = allCourses.stream()
-            .map(Course::getCourseId)
+            .map(Course::getId)
             .collect(Collectors.toList());
 
         int limit = Math.min(amount, students.size());
@@ -49,7 +49,7 @@ public class StudentsToCoursesSeeder implements Seeder {
             Student student = students.get(i);
             int quantityCourses = random.nextInt(maxCoursesPerStudent - minCoursesPerStudent + 1) + minCoursesPerStudent;
 
-            assignCourses(student.getStudentId(), quantityCourses, allCourseIds);
+            assignCourses(student.getId(), quantityCourses, allCourseIds);
         }
     }
 

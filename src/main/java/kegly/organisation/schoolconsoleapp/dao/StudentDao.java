@@ -15,7 +15,7 @@ public interface StudentDao {
 
      void removeStudentFromCourse(int studentId, int courseId);
 
-     List<Student> findStudentsByCourseName(String courseName);
+     List<Student> findByCourseName(String courseName);
 
     void update(Student student);
 }

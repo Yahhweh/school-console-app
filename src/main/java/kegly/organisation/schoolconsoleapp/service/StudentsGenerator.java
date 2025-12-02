@@ -1,19 +1,16 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.jdbc.GroupJdbc;
-import kegly.organisation.schoolconsoleapp.dao.jdbc.StudentJdbc;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcGroup;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcStudent;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
 
-import java.util.ArrayDeque;
-import java.util.List;
-import java.util.Queue;
-import java.util.Random;
+import java.util.*;
 
-public class StudentsSeeder implements Seeder {
+public class StudentsGenerator implements Seeder {
 
-    private final StudentJdbc studentJdbc;
-    private final GroupJdbc groupJdbc;
+    private final JdbcStudent jdbcStudent;
+    private final JdbcGroup jdbcGroup;
     private final Random random = new Random();
 
     private static final List<String> FIRST_NAMES = List.of(
@@ -30,9 +27,9 @@ public class StudentsSeeder implements Seeder {
         "Thomas", "Taylor", "Moore", "Jackson", "Martin"
     );
 
-    public StudentsSeeder(StudentJdbc studentJdbc, GroupJdbc groupJdbc) {
-        this.studentJdbc = studentJdbc;
-        this.groupJdbc = groupJdbc;
+    public StudentsGenerator(JdbcStudent jdbcStudent, JdbcGroup jdbcGroup) {
+        this.jdbcStudent = jdbcStudent;
+        this.jdbcGroup = jdbcGroup;
     }
 
     @Override
@@ -41,14 +38,15 @@ public class StudentsSeeder implements Seeder {
             String firstName = FIRST_NAMES.get(random.nextInt(FIRST_NAMES.size()));
             String lastName = LAST_NAMES.get(random.nextInt(LAST_NAMES.size()));
 
-            studentJdbc.save(new Student(null, null, firstName, lastName));
+            jdbcStudent.save(new Student(null, null, firstName, lastName));
         }
     }
 
     public void assignRandomGroups(int minStudents, int maxStudents) {
-        List<Group> groups = groupJdbc.findAll();
-        List<Student> allStudents = studentJdbc.findAll();
+        List<Group> groups = jdbcGroup.findAll();
+        List<Student> allStudents = jdbcStudent.findAll();
 
+        Collections.shuffle(allStudents);
         Queue<Student> studentQueue = new ArrayDeque<>(allStudents);
 
         for (Group group : groups) {
@@ -66,7 +64,8 @@ public class StudentsSeeder implements Seeder {
                 Student student = studentQueue.poll();
 
                 if (student != null) {
-                    studentJdbc.update(student);
+                    student.setGroupId(group.getId());
+                    jdbcStudent.update(student);
                 }
             }
         }

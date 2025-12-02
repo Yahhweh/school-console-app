@@ -13,11 +13,11 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
-class StudentsSeederToCoursesTest {
+class StudentsGeneratorToCoursesTest {
 
     private StudentDao mockStudentDao;
     private CourseDao mockCourseDao;
-    private StudentsToCoursesSeeder studentsToCoursesSeeder;
+    private StudentsToCoursesGenerator studentsToCoursesGenerator;
 
     private static final int STUDENTS_AMOUNT = 200;
     private static final int COURSES_AMOUNT = 10;
@@ -29,7 +29,7 @@ class StudentsSeederToCoursesTest {
         mockStudentDao = mock(StudentDao.class);
         mockCourseDao = mock(CourseDao.class);
 
-        studentsToCoursesSeeder = new StudentsToCoursesSeeder(
+        studentsToCoursesGenerator = new StudentsToCoursesGenerator(
             mockStudentDao,
             mockCourseDao,
             MIN_COURSES,
@@ -45,7 +45,7 @@ class StudentsSeederToCoursesTest {
         when(mockStudentDao.findAll()).thenReturn(mockStudents);
         when(mockCourseDao.findAll()).thenReturn(mockCourses);
 
-        studentsToCoursesSeeder.generate(STUDENTS_AMOUNT);
+        studentsToCoursesGenerator.generate(STUDENTS_AMOUNT);
         verify(mockStudentDao, atLeast(STUDENTS_AMOUNT * MIN_COURSES))
             .addCourseToStudent(anyInt(), anyInt());
 
@@ -57,7 +57,7 @@ class StudentsSeederToCoursesTest {
         List<Student> students = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             Student s = mock(Student.class);
-            when(s.getStudentId()).thenReturn(i + 1);
+            when(s.getId()).thenReturn(i + 1);
             students.add(s);
         }
         return students;
@@ -67,7 +67,7 @@ class StudentsSeederToCoursesTest {
         List<Course> courses = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             Course c = mock(Course.class);
-            when(c.getCourseId()).thenReturn(i + 1);
+            when(c.getId()).thenReturn(i + 1);
             courses.add(c);
         }
         return courses;

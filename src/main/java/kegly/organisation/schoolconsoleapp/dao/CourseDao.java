@@ -7,6 +7,8 @@ import java.util.List;
 public interface CourseDao {
 
     List<Course> findAll();
+
      void save(Course course);
+
     List<Course> findCoursesByStudentId(int studentId);
 }

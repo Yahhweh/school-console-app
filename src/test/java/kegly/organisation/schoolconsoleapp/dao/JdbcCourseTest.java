@@ -1,10 +1,9 @@
 package kegly.organisation.schoolconsoleapp.dao;
 
-import kegly.organisation.schoolconsoleapp.dao.jdbc.CourseJdbc;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcCourse;
 import kegly.organisation.schoolconsoleapp.db.DBConnection;
 import kegly.organisation.schoolconsoleapp.db.SchemaLoader;
 import kegly.organisation.schoolconsoleapp.entity.Course;
-import kegly.organisation.schoolconsoleapp.exception.DaoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,27 +12,23 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class CourseJdbcTest {
+class JdbcCourseTest {
 
     private DBConnection dbConnection;
-    private CourseJdbc courseJdbc;
-    private static final String dropAll = "DROP ALL OBJECTS";
+    private JdbcCourse jdbcCourse;
 
     @BeforeEach
     void setup() {
-        dbConnection = new DBConnection(){
-            @Override
-            public   Connection getConnection(){
-                return super.getTestConnection();
-            }
-        };
-        courseJdbc = new CourseJdbc(dbConnection);
+        dbConnection = new DBConnection("testApplication.properties");
+        jdbcCourse = new JdbcCourse(dbConnection);
+
         final String initialSql = "schema.sql";
 
         try (Connection conn = dbConnection.getConnection();
              Statement statement = conn.createStatement()) {
 
-            statement.execute(dropAll);
+            statement.execute("DROP ALL OBJECTS");
+
             SchemaLoader initializer = new SchemaLoader();
             initializer.runScript(conn, initialSql);
         } catch (SQLException e) {
@@ -45,7 +40,7 @@ class CourseJdbcTest {
     void findAll_returnCourses_whenRightConnection() {
         List<Course> expected = List.of();
 
-        List<Course> result = courseJdbc.findAll();
+        List<Course> result = jdbcCourse.findAll();
 
         assertEquals(expected, result);
 
@@ -61,9 +56,9 @@ class CourseJdbcTest {
 
         List<Course> expected = List.of(new Course(testId,testCourseName, testCourseDescription));
 
-        courseJdbc.save(newCourse);
+        jdbcCourse.save(newCourse);
 
-        List<Course> result = courseJdbc.findAll();
+        List<Course> result = jdbcCourse.findAll();
 
         assertEquals(expected,result);
     }

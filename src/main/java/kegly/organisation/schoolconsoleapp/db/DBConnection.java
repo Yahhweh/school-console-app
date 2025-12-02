@@ -1,7 +1,5 @@
 package kegly.organisation.schoolconsoleapp.db;
 
-import kegly.organisation.schoolconsoleapp.exception.DBException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -11,39 +9,37 @@ import java.util.Properties;
 
 public class DBConnection {
 
-    private static final String PROPERTIES_FILE = "application.properties";
-    private static final String TEST_PROPERTIES_FILE = "testApplication.properties";
+    private static final String DEFAULT_PROPERTIES_FILE = "application.properties";
+    private final Properties properties;
+
+    public DBConnection() {
+        this(DEFAULT_PROPERTIES_FILE);
+    }
+
+    public DBConnection(String propertiesFileName) {
+        this.properties = loadProperties(propertiesFileName);
+    }
 
     public Connection getConnection() {
-        return createConnection(PROPERTIES_FILE, "ds.url", "ds.username", "ds.password");
-    }
-
-    public Connection getTestConnection() {
-        return createConnection(TEST_PROPERTIES_FILE, "db.url", "ds.username", "ds.password");
-    }
-
-    private Connection createConnection(String fileName, String urlKey, String userKey, String passKey) {
-        Properties properties = loadProperties(fileName);
-
         try {
             return DriverManager.getConnection(
-                properties.getProperty(urlKey),
-                properties.getProperty(userKey),
-                properties.getProperty(passKey)
+                properties.getProperty("ds.url"),
+                properties.getProperty("ds.username"),
+                properties.getProperty("ds.password")
             );
         } catch (SQLException e) {
-            throw new DBException("Error connecting to the database using config: " + fileName, e);
+            throw new DBException("Failed to obtain database connection", e);
         }
     }
 
     private Properties loadProperties(String fileName) {
-        Properties properties = new Properties();
+        Properties props = new Properties();
         try (InputStream input = getClass().getClassLoader().getResourceAsStream(fileName)) {
             if (input == null) {
                 throw new DBException("Config file not found: " + fileName, null);
             }
-            properties.load(input);
-            return properties;
+            props.load(input);
+            return props;
         } catch (IOException e) {
             throw new DBException("Error loading configuration: " + fileName, e);
         }

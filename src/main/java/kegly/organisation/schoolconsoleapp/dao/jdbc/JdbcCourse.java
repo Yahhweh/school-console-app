@@ -3,7 +3,7 @@ package kegly.organisation.schoolconsoleapp.dao.jdbc;
 import kegly.organisation.schoolconsoleapp.dao.CourseDao;
 import kegly.organisation.schoolconsoleapp.db.DBConnection;
 import kegly.organisation.schoolconsoleapp.entity.Course;
-import kegly.organisation.schoolconsoleapp.exception.DaoException;
+import kegly.organisation.schoolconsoleapp.dao.DaoException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,39 +12,35 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CourseJdbc implements CourseDao {
+public class JdbcCourse implements CourseDao {
 
-    final String FIND_COURSES_BY_STUDENT_ID_SQL = "SELECT course_id FROM student_courses WHERE (studentId = ?)";
-    final String FIND_SQL = "SELECT * FROM courses";
-    final String SAVE_SQL = "INSERT INTO courses(course_name, course_description) VALUES (?, ?)";
+    private final static String FIND_COURSES_BY_STUDENT_ID_SQL = "SELECT course_id FROM student_courses WHERE (studentId = ?)";
+    private final static String FIND_SQL = "SELECT * FROM courses";
+    private final static String SAVE_SQL = "INSERT INTO courses(course_name, course_description) VALUES (?, ?)";
 
     private final DBConnection dBConnection;
 
-    public CourseJdbc(DBConnection DBConnection) {
+    public JdbcCourse(DBConnection DBConnection) {
         this.dBConnection = DBConnection;
     }
 
     @Override
     public List<Course> findAll() {
 
-        try (Connection connection = dBConnection.getConnection()) {
+        try (Connection connection = dBConnection.getConnection();
+             PreparedStatement st = connection.prepareStatement(FIND_SQL)) {
 
             List<Course> result = new ArrayList<>();
 
-            PreparedStatement st = connection.prepareStatement(FIND_SQL);
-
-            ResultSet rs = st.executeQuery();
-
-            while (rs.next()) {
-                Integer course_id = rs.getObject("course_id", Integer.class);
-                String course_name = rs.getString("course_name");
-                String course_description = rs.getString("course_description");
-                result.add(new Course(course_id, course_name, course_description));
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    result.add(mapRow(rs));
+                }
             }
             return result;
 
-        } catch (SQLException exeption) {
-            throw new DaoException(exeption.toString());
+        } catch (SQLException exception) {
+            throw new DaoException(exception.toString());
         }
     }
 
@@ -54,14 +50,14 @@ public class CourseJdbc implements CourseDao {
 
             PreparedStatement st = connection.prepareStatement(SAVE_SQL, PreparedStatement.RETURN_GENERATED_KEYS);
 
-            st.setString(1, course.getCourseName());
-            st.setString(2, course.getCourseDescription());
+            st.setString(1, course.getName());
+            st.setString(2, course.getDescription());
 
             st.executeUpdate();
 
             try (ResultSet resultSet = st.getGeneratedKeys()) {
                 if (resultSet.next()) {
-                    course.setCourseId(resultSet.getInt(1));
+                    course.setId(resultSet.getInt(1));
                 } else {
                     throw new DaoException("Didnt found id");
                 }
@@ -89,14 +85,18 @@ public class CourseJdbc implements CourseDao {
         try {
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
-                Integer courseId = rs.getObject("course_id", Integer.class);
-                String courseName = rs.getString("course_name");
-                String courseDescription = rs.getString("course_description");
-                result.add(new Course(courseId, courseName, courseDescription));
+                result.add(mapRow(rs));
             }
         } catch (SQLException e) {
             throw new DaoException(e.getMessage());
         }
         return result;
+    }
+
+    private Course mapRow(ResultSet rs) throws SQLException {
+        Integer courseId = rs.getObject("course_id", Integer.class);
+        String courseName = rs.getString("course_name");
+        String courseDescription = rs.getString("course_description");
+        return new Course(courseId, courseName, courseDescription);
     }
 }

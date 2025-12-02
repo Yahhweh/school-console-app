@@ -1,10 +1,9 @@
 package kegly.organisation.schoolconsoleapp.dao;
 
-import kegly.organisation.schoolconsoleapp.dao.jdbc.StudentJdbc;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcStudent;
 import kegly.organisation.schoolconsoleapp.db.DBConnection;
 import kegly.organisation.schoolconsoleapp.db.SchemaLoader;
 import kegly.organisation.schoolconsoleapp.entity.Student;
-import kegly.organisation.schoolconsoleapp.exception.DaoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,40 +15,37 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class StudentJdbcTest {
+class JdbcStudentTest {
 
-    private DBConnection dBConnection;
-    private StudentJdbc studentJdbc;
+    private DBConnection dbConnection;
+    private JdbcStudent jdbcStudent;
     private static final String DROP_ALL = "DROP ALL OBJECTS";
 
     @BeforeEach
     void setup() {
-        dBConnection = new DBConnection() {
-            @Override
-            public Connection getConnection() {
-                return super.getTestConnection();
-            }
-        };
-        studentJdbc = new StudentJdbc(dBConnection);
+        dbConnection = new DBConnection("testApplication.properties");
+        jdbcStudent = new JdbcStudent(dbConnection);
 
         final String initialSql = "schema.sql";
 
-        try (Connection conn = dBConnection.getConnection();
+        try (Connection conn = dbConnection.getConnection();
              Statement statement = conn.createStatement()) {
 
-            statement.execute(DROP_ALL);
+            statement.execute("DROP ALL OBJECTS");
+
             SchemaLoader initializer = new SchemaLoader();
             initializer.runScript(conn, initialSql);
         } catch (SQLException e) {
             throw new DaoException(e.getMessage());
         }
     }
+        final String initialSql = "schema.sql";
 
     @Test
     void findAll_returnStudents_whenRightConnection() {
         List<Student> expected = List.of();
 
-        List<Student> result = studentJdbc.findAll();
+        List<Student> result = jdbcStudent.findAll();
 
         assertEquals(expected, result);
     }
@@ -63,28 +59,28 @@ class StudentJdbcTest {
         Student newStudent = new Student(expectedId, null, firstName, lastName);
 
         List<Student> expected = List.of(newStudent);
-        studentJdbc.save(newStudent);
-        List<Student> result = studentJdbc.findAll();
+        jdbcStudent.save(newStudent);
+        List<Student> result = jdbcStudent.findAll();
 
         assertEquals(expected, result);
     }
 
     @Test
     void update_updatesStudentGroupId_whenGroupExists() {
-        try (Connection connection = dBConnection.getConnection();
+        try (Connection connection = dbConnection.getConnection();
              PreparedStatement st1 = connection.prepareStatement("INSERT INTO groups (group_id, group_name) VALUES (300, 'Science Group')")) {
             st1.executeUpdate();
         } catch (SQLException e) {
             throw new DaoException(e.getMessage());
         }
         Student student = new Student(1, 300, "Tom", "Hanks");
-        studentJdbc.save(student);
+        jdbcStudent.save(student);
 
-        studentJdbc.update(student);
+        jdbcStudent.update(student);
 
-        List<Student> students = studentJdbc.findAll();
+        List<Student> students = jdbcStudent.findAll();
         Student updatedStudent = students.stream()
-            .filter(s -> s.getStudentId() == 1)
+            .filter(s -> s.getId() == 1)
             .findFirst()
             .orElseThrow();
 
@@ -93,18 +89,18 @@ class StudentJdbcTest {
 
     @Test
     void deleteById_deletesStudentsById_WhenOneStudent() {
-        try (Connection connection = dBConnection.getConnection()) {
+        try (Connection connection = dbConnection.getConnection()) {
             PreparedStatement st1 = connection.prepareStatement("DELETE FROM students WHERE student_id = '1'");
             st1.executeUpdate();
         } catch (SQLException e) {
             throw new DaoException(e.getMessage());
         }
         Student student = new Student(1, null, "Tom", "Hanks");
-        studentJdbc.save(student);
+        jdbcStudent.save(student);
 
-        studentJdbc.deleteById(student.getStudentId());
+        jdbcStudent.deleteById(student.getId());
 
-        List<Student> expected = studentJdbc.findAll();
+        List<Student> expected = jdbcStudent.findAll();
 
         List<Student> result = List.of();
 
@@ -113,7 +109,7 @@ class StudentJdbcTest {
 
     @Test
     void removeStudentFromCourse_removesStudentFromCourse_WhenLinkExists() {
-        try (Connection connection = dBConnection.getConnection()) {
+        try (Connection connection = dbConnection.getConnection()) {
             PreparedStatement st1 = connection.prepareStatement("INSERT INTO courses (course_id, course_name, course_description) VALUES (50, 'Biology', 'Basic Biology')");
             st1.executeUpdate();
         } catch (SQLException e) {
@@ -121,12 +117,12 @@ class StudentJdbcTest {
         }
 
         Student student = new Student(1, null, "Tom", "Hanks");
-        studentJdbc.save(student);
-        studentJdbc.addCourseToStudent(1, 50);
+        jdbcStudent.save(student);
+        jdbcStudent.addCourseToStudent(1, 50);
 
-        studentJdbc.removeStudentFromCourse(1, 50);
+        jdbcStudent.removeStudentFromCourse(1, 50);
 
-        List<Student> result = studentJdbc.findStudentsByCourseName("Biology");
+        List<Student> result = jdbcStudent.findByCourseName("Biology");
         List<Student> expected = List.of();
 
         assertEquals(expected, result);

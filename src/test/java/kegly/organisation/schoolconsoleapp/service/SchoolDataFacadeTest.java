@@ -1,8 +1,8 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.jdbc.CourseJdbc;
-import kegly.organisation.schoolconsoleapp.dao.jdbc.GroupJdbc;
-import kegly.organisation.schoolconsoleapp.dao.jdbc.StudentJdbc;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcCourse;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcGroup;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcStudent;
 import kegly.organisation.schoolconsoleapp.db.DBConnection;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
@@ -25,11 +25,11 @@ import static org.mockito.Mockito.when;
 class SchoolDataFacadeTest {
 
     @Mock
-    private StudentJdbc studentJdbc;
+    private JdbcStudent jdbcStudent;
     @Mock
-    private GroupJdbc groupJdbc;
+    private JdbcGroup jdbcGroup;
     @Mock
-    private CourseJdbc courseJdbc;
+    private JdbcCourse jdbcCourse;
     @Mock
     private DBConnection DBConnection;
 
@@ -38,9 +38,9 @@ class SchoolDataFacadeTest {
     @BeforeEach
     void setUp() {
         schoolDataFacade = new SchoolDataFacade();
-        injectMock("studentJdbc", studentJdbc);
-        injectMock("groupJdbc", groupJdbc);
-        injectMock("courseJdbc", courseJdbc);
+        injectMock("jdbcStudent", jdbcStudent);
+        injectMock("jdbcGroup", jdbcGroup);
+        injectMock("jdbcCourse", jdbcCourse);
         injectMock("DBConnection", DBConnection);
     }
 
@@ -58,11 +58,11 @@ class SchoolDataFacadeTest {
     void findGroupsWithLessOrEqualStudents_returnGroupsList_whenCountIsProvided() {
         int count = 15;
         List<Group> expected = Collections.singletonList(new Group(1, "Group A"));
-        when(groupJdbc.findGroupsWithLessOrEqualStudents(count)).thenReturn(expected);
+        when(jdbcGroup.findGroupsWithLessOrEqualStudents(count)).thenReturn(expected);
 
         List<Group> result = schoolDataFacade.findGroupsWithLessOrEqualStudents(count);
 
-        verify(groupJdbc).findGroupsWithLessOrEqualStudents(count);
+        verify(jdbcGroup).findGroupsWithLessOrEqualStudents(count);
         assertEquals(expected, result);
     }
 
@@ -70,11 +70,11 @@ class SchoolDataFacadeTest {
     void findStudentsByCourseName_returnStudentList_whenCourseNameIsRight() {
         String courseName = "Math";
         List<Student> expected = Collections.singletonList(new Student(1, 1, "John", "Doe"));
-        when(studentJdbc.findStudentsByCourseName(courseName)).thenReturn(expected);
+        when(jdbcStudent.findByCourseName(courseName)).thenReturn(expected);
 
-        List<Student> result = schoolDataFacade.findStudentsByCourseName(courseName);
+        List<Student> result = schoolDataFacade.findByCourseName(courseName);
 
-        verify(studentJdbc).findStudentsByCourseName(courseName);
+        verify(jdbcStudent).findByCourseName(courseName);
         assertEquals(expected, result);
     }
 
@@ -86,7 +86,7 @@ class SchoolDataFacadeTest {
 
         schoolDataFacade.addNewStudent(firstName, lastName, groupId);
 
-        verify(studentJdbc).save(any(Student.class));
+        verify(jdbcStudent).save(any(Student.class));
     }
 
     @Test
@@ -95,7 +95,7 @@ class SchoolDataFacadeTest {
 
         schoolDataFacade.deleteStudentById(studentId);
 
-        verify(studentJdbc).deleteById(studentId);
+        verify(jdbcStudent).deleteById(studentId);
     }
 
     @Test
@@ -105,7 +105,7 @@ class SchoolDataFacadeTest {
 
         schoolDataFacade.addStudentToCourse(studentId, courseId);
 
-        verify(studentJdbc).addCourseToStudent(studentId, courseId);
+        verify(jdbcStudent).addCourseToStudent(studentId, courseId);
     }
 
     @Test
@@ -115,6 +115,6 @@ class SchoolDataFacadeTest {
 
         schoolDataFacade.removeStudentFromCourse(studentId, courseId);
 
-        verify(studentJdbc).removeStudentFromCourse(studentId, courseId);
+        verify(jdbcStudent).removeStudentFromCourse(studentId, courseId);
     }
 }

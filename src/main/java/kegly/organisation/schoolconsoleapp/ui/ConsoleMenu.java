@@ -62,14 +62,14 @@ public class ConsoleMenu {
         } else {
             System.out.printf("%-10s %-20s%n", "ID", "NAME");
             System.out.println("------------------------------");
-            groups.forEach(g -> System.out.printf("%-10d %-20s%n", g.getGroupId(), g.getGroupName()));
+            groups.forEach(g -> System.out.printf("%-10d %-20s%n", g.getId(), g.getName()));
         }
     }
 
     private void handleFindStudentsByCourse() {
         System.out.print("Enter course name (e.g. Mathematics): ");
         String courseName = scanner.nextLine();
-        List<Student> students = dataFactory.findStudentsByCourseName(courseName);
+        List<Student> students = dataFactory.findByCourseName(courseName);
 
         if (students.isEmpty()) {
             System.out.println("No students found for this course.");
@@ -77,7 +77,7 @@ public class ConsoleMenu {
             System.out.printf("%-5s %-15s %-15s%n", "ID", "First Name", "Last Name");
             System.out.println("----------------------------------------");
             students.forEach(s -> System.out.printf("%-5d %-15s %-15s%n",
-                s.getStudentId(), s.getFirstName(), s.getLastName()));
+                s.getId(), s.getFirstName(), s.getLastName()));
         }
     }
 

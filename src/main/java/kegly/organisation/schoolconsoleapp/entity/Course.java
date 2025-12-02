@@ -5,18 +5,18 @@ import lombok.Data;
 @Data
 public class Course {
 
-    private Integer courseId;
-    private String courseName;
-    private String courseDescription;
+    private Integer id;
+    private String name;
+    private String description;
 
-    public Course(int id, String courseName, String courseDescription) {
-        this.courseId = id;
-        this.courseName = courseName;
-        this.courseDescription = courseDescription;
+    public Course(int id, String name, String description) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
     }
 
-    public Course(String courseName, String courseDescription) {
-        this.courseName = courseName;
-        this.courseDescription = courseDescription;
+    public Course(String name, String description) {
+        this.name = name;
+        this.description = description;
     }
 }

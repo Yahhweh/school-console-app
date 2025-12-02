@@ -1,13 +1,12 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.jdbc.CourseJdbc;
-import kegly.organisation.schoolconsoleapp.dao.jdbc.GroupJdbc;
-import kegly.organisation.schoolconsoleapp.dao.jdbc.StudentJdbc;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcCourse;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcGroup;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcStudent;
 import kegly.organisation.schoolconsoleapp.db.DBConnection;
 import kegly.organisation.schoolconsoleapp.db.SchemaLoader;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
-import kegly.organisation.schoolconsoleapp.exception.ServiceException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -16,9 +15,9 @@ import java.util.List;
 public class SchoolDataFacade {
 
     private final DBConnection DBConnection;
-    private final StudentJdbc studentJdbc;
-    private final GroupJdbc groupJdbc;
-    private final CourseJdbc courseJdbc;
+    private final JdbcStudent jdbcStudent;
+    private final JdbcGroup jdbcGroup;
+    private final JdbcCourse jdbcCourse;
     private static final String initialSql = "schema.sql";
     private static final int coursesAmount = 10;
     private static final int groupsAmount = 10;
@@ -28,9 +27,9 @@ public class SchoolDataFacade {
 
     public SchoolDataFacade() {
         this.DBConnection = new DBConnection();
-        this.studentJdbc = new StudentJdbc(DBConnection);
-        this.groupJdbc = new GroupJdbc(DBConnection);
-        this.courseJdbc = new CourseJdbc(DBConnection);
+        this.jdbcStudent = new JdbcStudent(DBConnection);
+        this.jdbcGroup = new JdbcGroup(DBConnection);
+        this.jdbcCourse = new JdbcCourse(DBConnection);
     }
 
     public void initializeDatabase() {
@@ -39,15 +38,15 @@ public class SchoolDataFacade {
             new SchemaLoader().runScript(connection, initialSql);
 
             System.out.println("Generating data");
-            new CoursesSeeder(courseJdbc).generate(coursesAmount);
-            new GroupsSeeder(groupJdbc).generate(groupsAmount);
-            StudentsSeeder studentsSeeder = new StudentsSeeder(studentJdbc, groupJdbc);
-            studentsSeeder.generate(studentsAmount);
-            studentsSeeder.assignRandomGroups(10, 30);
+            new CourseGenerator(jdbcCourse).generate(coursesAmount);
+            new GroupsGenerator(jdbcGroup).generate(groupsAmount);
+            StudentsGenerator studentsGenerator = new StudentsGenerator(jdbcStudent, jdbcGroup);
+            studentsGenerator.generate(studentsAmount);
+            studentsGenerator.assignRandomGroups(10, 30);
 
-            new StudentsToCoursesSeeder(
-                studentJdbc,
-                courseJdbc,
+            new StudentsToCoursesGenerator(
+                jdbcStudent,
+                jdbcCourse,
                 MIN_COURSES_PER_STUDENT,
                 MAX_COURSES_PER_STUDENT
             ).generate(studentsAmount);
@@ -60,26 +59,26 @@ public class SchoolDataFacade {
     }
 
     public List<Group> findGroupsWithLessOrEqualStudents(int count) {
-        return groupJdbc.findGroupsWithLessOrEqualStudents(count);
+        return jdbcGroup.findGroupsWithLessOrEqualStudents(count);
     }
 
-    public List<Student> findStudentsByCourseName(String courseName) {
-        return studentJdbc.findStudentsByCourseName(courseName);
+    public List<Student> findByCourseName(String courseName) {
+        return jdbcStudent.findByCourseName(courseName);
     }
 
     public void addNewStudent(String firstName, String lastName, Integer groupId) {
-        studentJdbc.save(new Student(groupId, firstName, lastName));
+        jdbcStudent.save(new Student(groupId, firstName, lastName));
     }
 
     public void deleteStudentById(int studentId) {
-        studentJdbc.deleteById(studentId);
+        jdbcStudent.deleteById(studentId);
     }
 
     public void addStudentToCourse(int studentId, int courseId) {
-        studentJdbc.addCourseToStudent(studentId, courseId);
+        jdbcStudent.addCourseToStudent(studentId, courseId);
     }
 
     public void removeStudentFromCourse(int studentId, int courseId) {
-        studentJdbc.removeStudentFromCourse(studentId, courseId);
+        jdbcStudent.removeStudentFromCourse(studentId, courseId);
     }
 }

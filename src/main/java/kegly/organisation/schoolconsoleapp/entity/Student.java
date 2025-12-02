@@ -7,7 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class Student {
 
-    private Integer studentId;
+    private Integer id;
     private Integer groupId;
     private String firstName;
     private String lastName;

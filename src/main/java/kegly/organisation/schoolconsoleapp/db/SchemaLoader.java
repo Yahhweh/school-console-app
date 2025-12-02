@@ -1,6 +1,5 @@
     package kegly.organisation.schoolconsoleapp.db;
 
-    import kegly.organisation.schoolconsoleapp.exception.DBException;
     import lombok.AllArgsConstructor;
 
     import java.io.BufferedReader;

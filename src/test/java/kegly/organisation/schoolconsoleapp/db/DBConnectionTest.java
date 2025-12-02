@@ -1,6 +1,6 @@
 package kegly.organisation.schoolconsoleapp.db;
 
-import kegly.organisation.schoolconsoleapp.exception.DaoException;
+import kegly.organisation.schoolconsoleapp.dao.DaoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
