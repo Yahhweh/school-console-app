@@ -11,12 +11,14 @@ import java.util.List;
 
 public class JdbcStudent implements StudentDao {
 
-    private static final String SAVE_SQL = "INSERT INTO students (group_id, first_name, last_name) VALUES (?, ?, ?)";
-    private static final String FIND_ALL_SQL = "SELECT * FROM students";
-    private static final String ADD_COURSE_TO_STUDENT_SQL = "INSERT INTO student_courses(student_id, course_id) VALUES(?, ?)";
-    private static final String UPDATE_SQL = "UPDATE students SET group_id = ?, first_name = ?, last_name = ? WHERE student_id = ?";
-    private static final String DELETE_BY_ID_SQL = "DELETE FROM students WHERE student_id = ?";
+    private static final String SAVE_SQL                       = "INSERT INTO students (group_id, first_name, last_name) VALUES (?, ?, ?)";
+    private static final String FIND_ALL_SQL                   = "SELECT * FROM students";
+    private static final String UPDATE_SQL                     = "UPDATE students SET group_id = ?, first_name = ?, last_name = ? WHERE student_id = ?";
+    private static final String DELETE_BY_ID_SQL               = "DELETE FROM students WHERE student_id = ?";
+
     private static final String REMOVE_STUDENT_FROM_COURSE_SQL = "DELETE FROM student_courses WHERE student_id = ? AND course_id = ?";
+    private static final String ADD_COURSE_TO_STUDENT_SQL      = "INSERT INTO student_courses(student_id, course_id) VALUES(?, ?)";
+
     private static final String FIND_BY_COURSE_NAME_SQL = """
         SELECT s.student_id, s.group_id, s.first_name, s.last_name
         FROM students s

@@ -13,16 +13,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcGroup implements GroupDao {
-    private final DBConnection dBConnection;
     private static final String FIND_ALL_SQL = "SELECT * FROM groups";
-    private static final String SAVE_SQL = "INSERT INTO groups(group_name) VALUES(?)";
+    private static final String SAVE_SQL     = "INSERT INTO groups(group_name) VALUES(?)";
+
     private static final String FIND_GROUPS_WITH_LESS_OR_EQUAL_STUDENTS_SQL = """
-        SELECT g.group_id, g.group_name
-        FROM groups g
-        LEFT JOIN students s ON g.group_id = s.group_id
-        GROUP BY g.group_id, g.group_name
-        HAVING COUNT(s.student_id) <= ?
-        """;
+    SELECT g.group_id, g.group_name
+    FROM groups g
+    LEFT JOIN students s ON g.group_id = s.group_id
+    GROUP BY g.group_id, g.group_name
+    HAVING COUNT(s.student_id) <= ?
+    """;
+    private final DBConnection dBConnection;
 
     public JdbcGroup(DBConnection dBConnection) {
         this.dBConnection = dBConnection;

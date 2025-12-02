@@ -15,8 +15,8 @@ import java.util.List;
 public class JdbcCourse implements CourseDao {
 
     private final static String FIND_COURSES_BY_STUDENT_ID_SQL = "SELECT course_id FROM student_courses WHERE (studentId = ?)";
-    private final static String FIND_SQL = "SELECT * FROM courses";
-    private final static String SAVE_SQL = "INSERT INTO courses(course_name, course_description) VALUES (?, ?)";
+    private final static String FIND_SQL                       = "SELECT * FROM courses";
+    private final static String SAVE_SQL                       = "INSERT INTO courses(course_name, course_description) VALUES (?, ?)";
 
     private final DBConnection dBConnection;
 
@@ -46,9 +46,8 @@ public class JdbcCourse implements CourseDao {
 
     @Override
     public void save(Course course) {
-        try (Connection connection = dBConnection.getConnection()) {
-
-            PreparedStatement st = connection.prepareStatement(SAVE_SQL, PreparedStatement.RETURN_GENERATED_KEYS);
+        try (Connection connection = dBConnection.getConnection();
+             PreparedStatement st = connection.prepareStatement(SAVE_SQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             st.setString(1, course.getName());
             st.setString(2, course.getDescription());
@@ -70,9 +69,9 @@ public class JdbcCourse implements CourseDao {
 
     @Override
     public List<Course> findCoursesByStudentId(int studentId) {
-        try (Connection connection = dBConnection.getConnection();) {
+        try (Connection connection = dBConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_COURSES_BY_STUDENT_ID_SQL)) {
 
-            PreparedStatement statement = connection.prepareStatement(FIND_COURSES_BY_STUDENT_ID_SQL);
             List<Course> result = createResultSet(statement);
             return result;
         } catch (SQLException e) {

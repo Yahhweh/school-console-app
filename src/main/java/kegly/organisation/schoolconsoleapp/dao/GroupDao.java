@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface GroupDao {
      List<Group> findAll();
+
      void save(Group group);
+
      List<Group> findGroupsWithLessOrEqualStudents(int count);
 }
