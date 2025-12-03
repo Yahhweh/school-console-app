@@ -24,22 +24,19 @@ public class JdbcCourseDao implements CourseDao {
 
     private final ConnectionProvider dbConnectionProvider;
 
-    public JdbcCourseDao(ConnectionProvider ConnectionProvider) {
-        this.dbConnectionProvider = ConnectionProvider;
+    public JdbcCourseDao(ConnectionProvider connectionProvider) {
+        this.dbConnectionProvider = connectionProvider;
     }
 
     @Override
     public List<Course> findAll() {
-
         try (Connection connection = dbConnectionProvider.getConnection();
-             PreparedStatement st = connection.prepareStatement(FIND_SQL)) {
+             PreparedStatement st = connection.prepareStatement(FIND_SQL);
+             ResultSet rs = st.executeQuery()) {
 
             List<Course> result = new ArrayList<>();
-
-            try (ResultSet rs = st.executeQuery()) {
-                while (rs.next()) {
-                    result.add(mapRow(rs));
-                }
+            while (rs.next()) {
+                result.add(mapRow(rs));
             }
             return result;
 
@@ -62,12 +59,12 @@ public class JdbcCourseDao implements CourseDao {
                 if (resultSet.next()) {
                     course.setId(resultSet.getInt(1));
                 } else {
-                    throw new DaoException("Didnt found id");
+                    throw new DaoException("Failed to save course: ID not obtained");
                 }
             }
 
         } catch (SQLException exception) {
-            throw new DaoException(exception.getMessage());
+            throw new DaoException("Failed to save course: " + course.getName(), exception);
         }
     }
 
@@ -79,19 +76,18 @@ public class JdbcCourseDao implements CourseDao {
             statement.setInt(1, studentId);
             return parseMapRow(statement);
 
-            }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new DaoException("Failed to find courses for student ID: " + studentId, e);
         }
     }
 
-    private List<Course> parseMapRow(PreparedStatement statement) {
+    private List<Course> parseMapRow(PreparedStatement statement) throws SQLException {
         List<Course> result = new ArrayList<>();
+
         try (ResultSet rs = statement.executeQuery()) {
             while (rs.next()) {
                 result.add(mapRow(rs));
             }
-        } catch (SQLException e) {
-            throw new DaoException("Data access error", e);
         }
         return result;
     }
