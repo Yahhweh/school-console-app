@@ -5,17 +5,17 @@ import kegly.organisation.schoolconsoleapp.entity.Student;
 import java.util.List;
 
 public interface StudentDao {
-     void save(Student student);
+    void save(Student student);
 
-     List<Student> findAll();
+    List<Student> findAll();
 
-     void addCourseToStudent(int studentId, int courseId);
+    void addCourseToStudent(int studentId, int courseId);
 
-     void deleteById(int studentId);
+    void deleteById(int studentId);
 
-     void removeFromCourse(int studentId, int courseId);
+    void removeFromCourse(int studentId, int courseId);
 
-     List<Student> findByCourseName(String courseName);
+    List<Student> findByCourseName(String courseName);
 
     void update(Student student);
 }

@@ -18,12 +18,13 @@ public class JdbcGroupDao implements GroupDao {
     private static final String SAVE_SQL     = "INSERT INTO groups(group_name) VALUES(?)";
 
     private static final String FIND_WITH_LESS_OR_EQUAL_STUDENTS_SQL = """
-    SELECT g.group_id, g.group_name
-    FROM groups g
-    LEFT JOIN students s ON g.group_id = s.group_id
-    GROUP BY g.group_id, g.group_name
-    HAVING COUNT(s.student_id) <= ?
-    """;
+        SELECT g.group_id, g.group_name
+        FROM groups g
+        LEFT JOIN students s ON g.group_id = s.group_id
+        GROUP BY g.group_id, g.group_name
+        HAVING COUNT(s.student_id) <= ?
+        """;
+
     private final ConnectionProvider dBConnectionProvider;
 
     public JdbcGroupDao(ConnectionProvider dBConnectionProvider) {

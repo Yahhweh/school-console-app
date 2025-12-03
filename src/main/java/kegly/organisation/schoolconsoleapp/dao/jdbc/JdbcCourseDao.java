@@ -13,11 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcCourseDao implements CourseDao {
-    private static final String FIND_COURSES_BY_STUDENT_ID_SQL =
-        "SELECT c.course_id, c.course_name, c.course_description " +
-            "FROM courses c " +
-            "JOIN student_courses sc ON c.course_id = sc.course_id " +
-            "WHERE sc.student_id = ?";
+    private static final String FIND_COURSES_BY_STUDENT_ID_SQL = "SELECT c.course_id, c.course_name, c.course_description " + "FROM courses c " + "JOIN student_courses sc ON c.course_id = sc.course_id " + "WHERE sc.student_id = ?";
 
     private final static String FIND_SQL = "SELECT * FROM courses";
     private final static String SAVE_SQL = "INSERT INTO courses(course_name, course_description) VALUES (?, ?)";
@@ -30,9 +26,7 @@ public class JdbcCourseDao implements CourseDao {
 
     @Override
     public List<Course> findAll() {
-        try (Connection connection = dbConnectionProvider.getConnection();
-             PreparedStatement st = connection.prepareStatement(FIND_SQL);
-             ResultSet rs = st.executeQuery()) {
+        try (Connection connection = dbConnectionProvider.getConnection(); PreparedStatement st = connection.prepareStatement(FIND_SQL); ResultSet rs = st.executeQuery()) {
 
             List<Course> result = new ArrayList<>();
             while (rs.next()) {
@@ -47,8 +41,7 @@ public class JdbcCourseDao implements CourseDao {
 
     @Override
     public void save(Course course) {
-        try (Connection connection = dbConnectionProvider.getConnection();
-             PreparedStatement st = connection.prepareStatement(SAVE_SQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try (Connection connection = dbConnectionProvider.getConnection(); PreparedStatement st = connection.prepareStatement(SAVE_SQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             st.setString(1, course.getName());
             st.setString(2, course.getDescription());
@@ -70,8 +63,7 @@ public class JdbcCourseDao implements CourseDao {
 
     @Override
     public List<Course> findByStudentId(int studentId) {
-        try (Connection connection = dbConnectionProvider.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_COURSES_BY_STUDENT_ID_SQL)) {
+        try (Connection connection = dbConnectionProvider.getConnection(); PreparedStatement statement = connection.prepareStatement(FIND_COURSES_BY_STUDENT_ID_SQL)) {
 
             statement.setInt(1, studentId);
             return parseMapRow(statement);
