@@ -1,38 +1,30 @@
 package kegly.organisation.schoolconsoleapp.db;
 
-import kegly.organisation.schoolconsoleapp.dao.DaoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class DBConnectionTest {
+class ConnectionProviderTest {
 
-    private DBConnection DBConnection;
+    private ConnectionProvider connectionProvider;
 
     @BeforeEach
-    void setup() {
-        DBConnection = new DBConnection();
+    void setup() throws IOException {
+        connectionProvider = new ConnectionProvider();
     }
 
     @Test
-    void generate_returnsExactAmount_whenRequestedCountGiven() {
+    void getConnection_shouldReturnValidConnection() throws SQLException {
 
-        try (Connection connection = DBConnection.getConnection()) {
-
+        try (Connection connection = connectionProvider.getConnection()) {
             assertNotNull(connection);
-
             assertTrue(connection.isValid(1));
-
-        } catch (
-                SQLException e) {
-            throw new DaoException(e.getMessage());
         }
     }
-
-
 }

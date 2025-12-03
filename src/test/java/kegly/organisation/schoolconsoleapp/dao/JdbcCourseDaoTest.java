@@ -1,7 +1,7 @@
 package kegly.organisation.schoolconsoleapp.dao;
 
-import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcCourse;
-import kegly.organisation.schoolconsoleapp.db.DBConnection;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcCourseDao;
+import kegly.organisation.schoolconsoleapp.db.ConnectionProvider;
 import kegly.organisation.schoolconsoleapp.db.SchemaLoader;
 import kegly.organisation.schoolconsoleapp.entity.Course;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,19 +12,19 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class JdbcCourseTest {
+class JdbcCourseDaoTest {
 
-    private DBConnection dbConnection;
-    private JdbcCourse jdbcCourse;
+    private ConnectionProvider connectionProvider;
+    private JdbcCourseDao jdbcCourseDao;
 
     @BeforeEach
-    void setup() {
-        dbConnection = new DBConnection("testApplication.properties");
-        jdbcCourse = new JdbcCourse(dbConnection);
+    void setup() throws Exception {
+        connectionProvider = new ConnectionProvider("testApplication.properties");
+        jdbcCourseDao = new JdbcCourseDao(connectionProvider);
 
         final String initialSql = "schema.sql";
 
-        try (Connection conn = dbConnection.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              Statement statement = conn.createStatement()) {
 
             statement.execute("DROP ALL OBJECTS");
@@ -40,7 +40,7 @@ class JdbcCourseTest {
     void findAll_returnCourses_whenRightConnection() {
         List<Course> expected = List.of();
 
-        List<Course> result = jdbcCourse.findAll();
+        List<Course> result = jdbcCourseDao.findAll();
 
         assertEquals(expected, result);
 
@@ -56,9 +56,9 @@ class JdbcCourseTest {
 
         List<Course> expected = List.of(new Course(testId,testCourseName, testCourseDescription));
 
-        jdbcCourse.save(newCourse);
+        jdbcCourseDao.save(newCourse);
 
-        List<Course> result = jdbcCourse.findAll();
+        List<Course> result = jdbcCourseDao.findAll();
 
         assertEquals(expected,result);
     }

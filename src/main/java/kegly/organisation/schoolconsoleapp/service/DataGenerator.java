@@ -1,6 +1,6 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-public interface Seeder {
+public interface DataGenerator {
 
     void generate(int amount);
 }

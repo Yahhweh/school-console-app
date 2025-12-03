@@ -1,7 +1,7 @@
 package kegly.organisation.schoolconsoleapp.dao.jdbc;
 
 import kegly.organisation.schoolconsoleapp.dao.GroupDao;
-import kegly.organisation.schoolconsoleapp.db.DBConnection;
+import kegly.organisation.schoolconsoleapp.db.ConnectionProvider;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.dao.DaoException;
 
@@ -12,28 +12,29 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JdbcGroup implements GroupDao {
+public class JdbcGroupDao implements GroupDao {
+
     private static final String FIND_ALL_SQL = "SELECT * FROM groups";
     private static final String SAVE_SQL     = "INSERT INTO groups(group_name) VALUES(?)";
 
-    private static final String FIND_GROUPS_WITH_LESS_OR_EQUAL_STUDENTS_SQL = """
+    private static final String FIND_WITH_LESS_OR_EQUAL_STUDENTS_SQL = """
     SELECT g.group_id, g.group_name
     FROM groups g
     LEFT JOIN students s ON g.group_id = s.group_id
     GROUP BY g.group_id, g.group_name
     HAVING COUNT(s.student_id) <= ?
     """;
-    private final DBConnection dBConnection;
+    private final ConnectionProvider dBConnectionProvider;
 
-    public JdbcGroup(DBConnection dBConnection) {
-        this.dBConnection = dBConnection;
+    public JdbcGroupDao(ConnectionProvider dBConnectionProvider) {
+        this.dBConnectionProvider = dBConnectionProvider;
     }
 
     @Override
     public List<Group> findAll() {
         List<Group> result = new ArrayList<>();
 
-        try (Connection connection = dBConnection.getConnection();
+        try (Connection connection = dBConnectionProvider.getConnection();
              PreparedStatement st = connection.prepareStatement(FIND_ALL_SQL);
              ResultSet rs = st.executeQuery()) {
 
@@ -49,7 +50,7 @@ public class JdbcGroup implements GroupDao {
 
     @Override
     public void save(Group group) {
-        try (Connection connection = dBConnection.getConnection();
+        try (Connection connection = dBConnectionProvider.getConnection();
              PreparedStatement st = connection.prepareStatement(SAVE_SQL)) {
 
             st.setString(1, group.getName());
@@ -61,10 +62,10 @@ public class JdbcGroup implements GroupDao {
     }
 
     @Override
-    public List<Group> findGroupsWithLessOrEqualStudents(int count) {
+    public List<Group> findWithLessOrEqualStudents(int count) {
         List<Group> groups = new ArrayList<>();
-        try (Connection connection = dBConnection.getConnection();
-             PreparedStatement st = connection.prepareStatement(FIND_GROUPS_WITH_LESS_OR_EQUAL_STUDENTS_SQL)) {
+        try (Connection connection = dBConnectionProvider.getConnection();
+             PreparedStatement st = connection.prepareStatement(FIND_WITH_LESS_OR_EQUAL_STUDENTS_SQL)) {
 
             st.setInt(1, count);
 

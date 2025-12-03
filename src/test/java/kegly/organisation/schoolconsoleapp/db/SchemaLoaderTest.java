@@ -2,6 +2,7 @@ package kegly.organisation.schoolconsoleapp.db;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,11 +13,11 @@ import static org.junit.jupiter.api.Assertions.fail;
 class SchemaLoaderTest {
 
     @Test
-    void runScript_shouldCreateTables_whenFileExists() {
-        DBConnection DBConnection = new DBConnection();
+    void runScript_shouldCreateTables_whenFileExists() throws IOException {
+        ConnectionProvider connectionProvider = new ConnectionProvider();
         final String initialSql = "schema.sql";
 
-        try(Connection connection = DBConnection.getConnection()) {
+        try(Connection connection = connectionProvider.getConnection()) {
             SchemaLoader schemaLoader = new SchemaLoader();
             schemaLoader.runScript(connection, initialSql);
 

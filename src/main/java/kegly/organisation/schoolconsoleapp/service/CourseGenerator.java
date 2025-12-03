@@ -1,12 +1,12 @@
 package kegly.organisation.schoolconsoleapp.service;
 
 import kegly.organisation.schoolconsoleapp.dao.CourseDao;
-import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcCourse;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcCourseDao;
 import kegly.organisation.schoolconsoleapp.entity.Course;
 
 import java.util.List;
 
-public class CourseGenerator implements Seeder {
+public class CourseGenerator implements DataGenerator {
 
     private static final List<String> subjects = List.of(
         "Mathematics",
@@ -20,16 +20,16 @@ public class CourseGenerator implements Seeder {
         "English Language",
         "Computer Graphics"
     );
-    private CourseDao jdbcCourse;
+    private CourseDao courseDao;
 
-    public CourseGenerator(JdbcCourse jdbcCourse) {
-        this.jdbcCourse = jdbcCourse;
+    public CourseGenerator(CourseDao courseDao) {
+        this.courseDao = courseDao;
     }
 
     @Override
     public void generate(int amount ) {
         for (int i = 0; i < amount; i++) {
-            jdbcCourse.save(new Course(subjects.get(i), generateDescription(subjects.get(i))));
+            courseDao.save(new Course(subjects.get(i), generateDescription(subjects.get(i))));
         }
     }
 

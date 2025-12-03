@@ -8,5 +8,4 @@
 /dataSources.local.xml
 .idea/
 target/
-src/main/resources/
 javajdbcsample.iml

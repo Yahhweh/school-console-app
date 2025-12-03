@@ -9,5 +9,5 @@ public interface GroupDao {
 
      void save(Group group);
 
-     List<Group> findGroupsWithLessOrEqualStudents(int count);
+     List<Group> findWithLessOrEqualStudents(int count);
 }

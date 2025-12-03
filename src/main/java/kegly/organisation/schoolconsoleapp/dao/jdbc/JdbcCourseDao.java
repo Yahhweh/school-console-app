@@ -1,9 +1,9 @@
 package kegly.organisation.schoolconsoleapp.dao.jdbc;
 
 import kegly.organisation.schoolconsoleapp.dao.CourseDao;
-import kegly.organisation.schoolconsoleapp.db.DBConnection;
-import kegly.organisation.schoolconsoleapp.entity.Course;
 import kegly.organisation.schoolconsoleapp.dao.DaoException;
+import kegly.organisation.schoolconsoleapp.db.ConnectionProvider;
+import kegly.organisation.schoolconsoleapp.entity.Course;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,22 +12,26 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JdbcCourse implements CourseDao {
+public class JdbcCourseDao implements CourseDao {
+    private static final String FIND_COURSES_BY_STUDENT_ID_SQL =
+        "SELECT c.course_id, c.course_name, c.course_description " +
+            "FROM courses c " +
+            "JOIN student_courses sc ON c.course_id = sc.course_id " +
+            "WHERE sc.student_id = ?";
 
-    private final static String FIND_COURSES_BY_STUDENT_ID_SQL = "SELECT course_id FROM student_courses WHERE (studentId = ?)";
-    private final static String FIND_SQL                       = "SELECT * FROM courses";
-    private final static String SAVE_SQL                       = "INSERT INTO courses(course_name, course_description) VALUES (?, ?)";
+    private final static String FIND_SQL = "SELECT * FROM courses";
+    private final static String SAVE_SQL = "INSERT INTO courses(course_name, course_description) VALUES (?, ?)";
 
-    private final DBConnection dBConnection;
+    private final ConnectionProvider dbConnectionProvider;
 
-    public JdbcCourse(DBConnection DBConnection) {
-        this.dBConnection = DBConnection;
+    public JdbcCourseDao(ConnectionProvider ConnectionProvider) {
+        this.dbConnectionProvider = ConnectionProvider;
     }
 
     @Override
     public List<Course> findAll() {
 
-        try (Connection connection = dBConnection.getConnection();
+        try (Connection connection = dbConnectionProvider.getConnection();
              PreparedStatement st = connection.prepareStatement(FIND_SQL)) {
 
             List<Course> result = new ArrayList<>();
@@ -40,13 +44,13 @@ public class JdbcCourse implements CourseDao {
             return result;
 
         } catch (SQLException exception) {
-            throw new DaoException(exception.toString());
+            throw new DaoException("Failed to find all courses", exception);
         }
     }
 
     @Override
     public void save(Course course) {
-        try (Connection connection = dBConnection.getConnection();
+        try (Connection connection = dbConnectionProvider.getConnection();
              PreparedStatement st = connection.prepareStatement(SAVE_SQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             st.setString(1, course.getName());
@@ -68,26 +72,26 @@ public class JdbcCourse implements CourseDao {
     }
 
     @Override
-    public List<Course> findCoursesByStudentId(int studentId) {
-        try (Connection connection = dBConnection.getConnection();
+    public List<Course> findByStudentId(int studentId) {
+        try (Connection connection = dbConnectionProvider.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_COURSES_BY_STUDENT_ID_SQL)) {
 
-            List<Course> result = createResultSet(statement);
-            return result;
-        } catch (SQLException e) {
-            throw new DaoException(e.getMessage());
+            statement.setInt(1, studentId);
+            return parseMapRow(statement);
+
+            }catch (SQLException e) {
+            throw new DaoException("Failed to find courses for student ID: " + studentId, e);
         }
     }
 
-    private List<Course> createResultSet(PreparedStatement statement) {
+    private List<Course> parseMapRow(PreparedStatement statement) {
         List<Course> result = new ArrayList<>();
-        try {
-            ResultSet rs = statement.executeQuery();
+        try (ResultSet rs = statement.executeQuery()) {
             while (rs.next()) {
                 result.add(mapRow(rs));
             }
         } catch (SQLException e) {
-            throw new DaoException(e.getMessage());
+            throw new DaoException("Data access error", e);
         }
         return result;
     }

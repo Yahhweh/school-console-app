@@ -13,7 +13,7 @@ public interface StudentDao {
 
      void deleteById(int studentId);
 
-     void removeStudentFromCourse(int studentId, int courseId);
+     void removeFromCourse(int studentId, int courseId);
 
      List<Student> findByCourseName(String courseName);
 

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class StudentsToCoursesGenerator implements Seeder {
+public class StudentsToCoursesGenerator implements DataGenerator {
 
     private final StudentDao studentDao;
     private final CourseDao courseDao;

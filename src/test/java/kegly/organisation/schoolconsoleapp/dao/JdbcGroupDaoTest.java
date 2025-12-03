@@ -1,14 +1,15 @@
 package kegly.organisation.schoolconsoleapp.dao;
 
-import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcGroup;
-import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcStudent;
-import kegly.organisation.schoolconsoleapp.db.DBConnection;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcGroupDao;
+import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcStudentDao;
+import kegly.organisation.schoolconsoleapp.db.ConnectionProvider;
 import kegly.organisation.schoolconsoleapp.db.SchemaLoader;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -17,22 +18,22 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class JdbcGroupTest {
+class JdbcGroupDaoTest {
 
-    private DBConnection dbConnection;
-    private JdbcGroup jdbcGroup;
-    private JdbcStudent jdbcStudent;
+    private ConnectionProvider connectionProvider;
+    private JdbcGroupDao jdbcGroupDao;
+    private JdbcStudentDao jdbcStudentDao;
     private static final String dropAll = "DROP ALL OBJECTS";
 
     @BeforeEach
-    void setup() {
-        dbConnection = new DBConnection("testApplication.properties");
-        jdbcGroup = new JdbcGroup(dbConnection);
-        jdbcStudent = new JdbcStudent(dbConnection);
+    void setup() throws IOException {
+        connectionProvider = new ConnectionProvider("testApplication.properties");
+        jdbcGroupDao = new JdbcGroupDao(connectionProvider);
+        jdbcStudentDao = new JdbcStudentDao(connectionProvider);
 
         final String initialSql = "schema.sql";
 
-        try (Connection conn = dbConnection.getConnection();
+        try (Connection conn = connectionProvider.getConnection();
              Statement statement = conn.createStatement()) {
 
             statement.execute("DROP ALL OBJECTS");
@@ -48,7 +49,7 @@ class JdbcGroupTest {
     void getGroups_returnGroups_whenRightConnection() {
         List<Group> expected = List.of();
 
-        List<Group> result = jdbcGroup.findAll();
+        List<Group> result = jdbcGroupDao.findAll();
 
         assertEquals(expected, result);
 
@@ -61,16 +62,16 @@ class JdbcGroupTest {
 
         List<Group> expected = List.of(new Group(1, testGroupName));
 
-        jdbcGroup.save(newGroup);
+        jdbcGroupDao.save(newGroup);
 
-        List<Group> result = jdbcGroup.findAll();
+        List<Group> result = jdbcGroupDao.findAll();
 
         assertEquals(expected,result);
     }
 
     @Test
-    void findGroupsWithLessOrEqualStudents_returnsFilteredGroups_whenTwoStudents() {
-        try (Connection connection = dbConnection.getConnection();
+    void findWithLessOrEqualStudents_returnsFiltered_whenTwoStudents() {
+        try (Connection connection = connectionProvider.getConnection();
              PreparedStatement st1 = connection.prepareStatement("INSERT INTO groups (group_id, group_name) VALUES (100, 'Group A')");
              PreparedStatement st2 = connection.prepareStatement("INSERT INTO groups (group_id, group_name) VALUES (200, 'Group B')")) {
 
@@ -84,11 +85,11 @@ class JdbcGroupTest {
         Student s2 = new Student(2, 100, "Student", "Two");
         Student s3 = new Student(3, 200, "Student", "Three");
 
-        jdbcStudent.save(s1);
-        jdbcStudent.save(s2);
-        jdbcStudent.save(s3);
+        jdbcStudentDao.save(s1);
+        jdbcStudentDao.save(s2);
+        jdbcStudentDao.save(s3);
 
-        List<Group> result = jdbcGroup.findGroupsWithLessOrEqualStudents(1);
+        List<Group> result = jdbcGroupDao.findWithLessOrEqualStudents(1);
 
         assertEquals(1, result.size());
         assertEquals("Group B", result.get(0).getName());

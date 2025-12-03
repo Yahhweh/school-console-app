@@ -1,7 +1,7 @@
 package kegly.organisation.schoolconsoleapp.dao.jdbc;
 
 import kegly.organisation.schoolconsoleapp.dao.StudentDao;
-import kegly.organisation.schoolconsoleapp.db.DBConnection;
+import kegly.organisation.schoolconsoleapp.db.ConnectionProvider;
 import kegly.organisation.schoolconsoleapp.entity.Student;
 import kegly.organisation.schoolconsoleapp.dao.DaoException;
 
@@ -9,14 +9,14 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JdbcStudent implements StudentDao {
+public class JdbcStudentDao implements StudentDao {
 
     private static final String SAVE_SQL                       = "INSERT INTO students (group_id, first_name, last_name) VALUES (?, ?, ?)";
     private static final String FIND_ALL_SQL                   = "SELECT * FROM students";
     private static final String UPDATE_SQL                     = "UPDATE students SET group_id = ?, first_name = ?, last_name = ? WHERE student_id = ?";
     private static final String DELETE_BY_ID_SQL               = "DELETE FROM students WHERE student_id = ?";
 
-    private static final String REMOVE_STUDENT_FROM_COURSE_SQL = "DELETE FROM student_courses WHERE student_id = ? AND course_id = ?";
+    private static final String REMOVE_FROM_COURSE_SQL = "DELETE FROM student_courses WHERE student_id = ? AND course_id = ?";
     private static final String ADD_COURSE_TO_STUDENT_SQL      = "INSERT INTO student_courses(student_id, course_id) VALUES(?, ?)";
 
     private static final String FIND_BY_COURSE_NAME_SQL = """
@@ -27,17 +27,17 @@ public class JdbcStudent implements StudentDao {
         WHERE c.course_name = ?
         """;
 
-    private final DBConnection DBConnection;
+    private final ConnectionProvider ConnectionProvider;
 
-    public JdbcStudent(DBConnection DBConnection) {
-        this.DBConnection = DBConnection;
+    public JdbcStudentDao(ConnectionProvider ConnectionProvider) {
+        this.ConnectionProvider = ConnectionProvider;
     }
 
     @Override
     public void save(Student student) {
 
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE_SQL)) {
+        try (Connection connection = ConnectionProvider.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
 
             statement.setObject(1, student.getGroupId(), Types.INTEGER);
             statement.setString(2, student.getFirstName());
@@ -45,8 +45,22 @@ public class JdbcStudent implements StudentDao {
 
             statement.executeUpdate();
 
+            try(ResultSet resultSet = statement.getGeneratedKeys()) {
+                assignGeneratedId(resultSet, student);
+            }catch (SQLException e){
+                throw new DaoException(e.getMessage());
+            }
+
         } catch (SQLException e) {
             throw new DaoException("Failed to save student", e);
+        }
+    }
+
+    private void assignGeneratedId(ResultSet generatedKeys, Student student) throws SQLException{
+        if(generatedKeys.next()){
+            student.setId(generatedKeys.getInt(1));
+        }else {
+            throw  new DaoException("Creating student failed. No generated id");
         }
     }
 
@@ -54,17 +68,12 @@ public class JdbcStudent implements StudentDao {
     public List<Student> findAll() {
         List<Student> students = new ArrayList<>();
 
-        try (Connection connection = DBConnection.getConnection();
+        try (Connection connection = ConnectionProvider.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_ALL_SQL);
              ResultSet rs = statement.executeQuery()) {
 
             while (rs.next()) {
-                Integer studentId = rs.getObject("student_id", Integer.class);
-                Integer groupId = rs.getObject("group_id", Integer.class);
-                String firstName = rs.getString("first_name");
-                String lastName = rs.getString("last_name");
-
-                students.add(new Student(studentId, groupId, firstName, lastName));
+                students.add(mapRow(rs));
             }
             return students;
 
@@ -75,7 +84,7 @@ public class JdbcStudent implements StudentDao {
 
     @Override
     public void addCourseToStudent(int studentId, int courseId) {
-        try (Connection connection = DBConnection.getConnection();
+        try (Connection connection = ConnectionProvider.getConnection();
              PreparedStatement statement = connection.prepareStatement(ADD_COURSE_TO_STUDENT_SQL)) {
 
             statement.setObject(1, studentId, Types.INTEGER);
@@ -89,7 +98,7 @@ public class JdbcStudent implements StudentDao {
 
     public void deleteById(int studentId) {
 
-        try (Connection connection = DBConnection.getConnection();
+        try (Connection connection = ConnectionProvider.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID_SQL)) {
 
             statement.setInt(1, studentId);
@@ -105,10 +114,10 @@ public class JdbcStudent implements StudentDao {
     }
 
     @Override
-    public void removeStudentFromCourse(int studentId, int courseId) {
+    public void removeFromCourse(int studentId, int courseId) {
 
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(REMOVE_STUDENT_FROM_COURSE_SQL)) {
+        try (Connection connection = ConnectionProvider.getConnection();
+             PreparedStatement statement = connection.prepareStatement(REMOVE_FROM_COURSE_SQL)) {
 
             statement.setInt(1, studentId);
             statement.setInt(2, courseId);
@@ -124,18 +133,13 @@ public class JdbcStudent implements StudentDao {
     public List<Student> findByCourseName(String courseName) {
         List<Student> students = new ArrayList<>();
 
-        try (Connection connection = DBConnection.getConnection();
+        try (Connection connection = ConnectionProvider.getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_BY_COURSE_NAME_SQL)) {
 
             statement.setString(1, courseName);
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
-                    students.add(new Student(
-                        rs.getInt("student_id"),
-                        rs.getObject("group_id", Integer.class),
-                        rs.getString("first_name"),
-                        rs.getString("last_name")
-                    ));
+                    students.add(mapRow(rs));
                 }
             }
             return students;
@@ -147,7 +151,8 @@ public class JdbcStudent implements StudentDao {
 
     @Override
     public void update(Student student) {
-        try (Connection connection = DBConnection.getConnection(); PreparedStatement statement = connection.prepareStatement(UPDATE_SQL)) {
+        try (Connection connection = ConnectionProvider.getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE_SQL)) {
             statement.setObject(1, student.getGroupId(), Types.INTEGER);
             statement.setString(2, student.getFirstName());
             statement.setString(3, student.getLastName());
@@ -159,5 +164,12 @@ public class JdbcStudent implements StudentDao {
         }
     }
 
+    private Student mapRow(ResultSet rs) throws SQLException {
+        Integer studentId = rs.getObject("student_id", Integer.class);
+        Integer groupId = rs.getObject("group_id", Integer.class);
+        String firstName = rs.getString("first_name");
+        String lastName = rs.getString("last_name");
+        return new Student(studentId,groupId,firstName, lastName);
+    }
 
 }
