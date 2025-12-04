@@ -16,7 +16,7 @@ class ConnectionProviderTest {
 
     @BeforeEach
     void setup() throws IOException {
-        connectionProvider = new ConnectionProvider();
+        connectionProvider = new ConnectionProvider("testApplication.properties");
     }
 
     @Test

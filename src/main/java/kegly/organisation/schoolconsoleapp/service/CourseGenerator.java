@@ -1,7 +1,6 @@
 package kegly.organisation.schoolconsoleapp.service;
 
 import kegly.organisation.schoolconsoleapp.dao.CourseDao;
-import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcCourseDao;
 import kegly.organisation.schoolconsoleapp.entity.Course;
 
 import java.util.List;
@@ -27,7 +26,7 @@ public class CourseGenerator implements DataGenerator {
     }
 
     @Override
-    public void generate(int amount ) {
+    public void generate(int amount) {
         for (int i = 0; i < amount; i++) {
             courseDao.save(new Course(subjects.get(i), generateDescription(subjects.get(i))));
         }

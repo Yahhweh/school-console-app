@@ -18,15 +18,16 @@ public class JdbcCourseDao implements CourseDao {
     private final static String FIND_SQL = "SELECT * FROM courses";
     private final static String SAVE_SQL = "INSERT INTO courses(course_name, course_description) VALUES (?, ?)";
 
-    private final ConnectionProvider dbConnectionProvider;
+    private final ConnectionProvider connectionProvider;
 
     public JdbcCourseDao(ConnectionProvider connectionProvider) {
-        this.dbConnectionProvider = connectionProvider;
+        this.connectionProvider = connectionProvider;
     }
 
     @Override
     public List<Course> findAll() {
-        try (Connection connection = dbConnectionProvider.getConnection(); PreparedStatement st = connection.prepareStatement(FIND_SQL); ResultSet rs = st.executeQuery()) {
+        try (Connection connection = connectionProvider.getConnection();
+                PreparedStatement st = connection.prepareStatement(FIND_SQL); ResultSet rs = st.executeQuery()) {
 
             List<Course> result = new ArrayList<>();
             while (rs.next()) {
@@ -41,7 +42,8 @@ public class JdbcCourseDao implements CourseDao {
 
     @Override
     public void save(Course course) {
-        try (Connection connection = dbConnectionProvider.getConnection(); PreparedStatement st = connection.prepareStatement(SAVE_SQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try (Connection connection = connectionProvider.getConnection();
+             PreparedStatement st = connection.prepareStatement(SAVE_SQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             st.setString(1, course.getName());
             st.setString(2, course.getDescription());
@@ -63,17 +65,18 @@ public class JdbcCourseDao implements CourseDao {
 
     @Override
     public List<Course> findByStudentId(int studentId) {
-        try (Connection connection = dbConnectionProvider.getConnection(); PreparedStatement statement = connection.prepareStatement(FIND_COURSES_BY_STUDENT_ID_SQL)) {
+        try (Connection connection = connectionProvider.getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_COURSES_BY_STUDENT_ID_SQL)) {
 
             statement.setInt(1, studentId);
-            return parseMapRow(statement);
+            return extractCourses(statement);
 
         } catch (SQLException e) {
             throw new DaoException("Failed to find courses for student ID: " + studentId, e);
         }
     }
 
-    private List<Course> parseMapRow(PreparedStatement statement) throws SQLException {
+    private List<Course> extractCourses(PreparedStatement statement) throws SQLException {
         List<Course> result = new ArrayList<>();
 
         try (ResultSet rs = statement.executeQuery()) {

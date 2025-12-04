@@ -1,21 +1,18 @@
 package kegly.organisation.schoolconsoleapp.dao.jdbc;
 
+import kegly.organisation.schoolconsoleapp.dao.DaoException;
 import kegly.organisation.schoolconsoleapp.dao.GroupDao;
 import kegly.organisation.schoolconsoleapp.db.ConnectionProvider;
 import kegly.organisation.schoolconsoleapp.entity.Group;
-import kegly.organisation.schoolconsoleapp.dao.DaoException;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcGroupDao implements GroupDao {
 
     private static final String FIND_ALL_SQL = "SELECT * FROM groups";
-    private static final String SAVE_SQL     = "INSERT INTO groups(group_name) VALUES(?)";
+    private static final String SAVE_SQL = "INSERT INTO groups(group_name) VALUES(?)";
 
     private static final String FIND_WITH_LESS_OR_EQUAL_STUDENTS_SQL = """
         SELECT g.group_id, g.group_name
@@ -52,10 +49,18 @@ public class JdbcGroupDao implements GroupDao {
     @Override
     public void save(Group group) {
         try (Connection connection = dBConnectionProvider.getConnection();
-             PreparedStatement st = connection.prepareStatement(SAVE_SQL)) {
+             PreparedStatement st = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
 
             st.setString(1, group.getName());
             st.executeUpdate();
+
+            try (ResultSet resultSet = st.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    group.setId(resultSet.getInt(1));
+                } else {
+                    throw new DaoException("Failed to save course: ID not obtained");
+                }
+            }
 
         } catch (SQLException exception) {
             throw new DaoException(exception.getMessage());

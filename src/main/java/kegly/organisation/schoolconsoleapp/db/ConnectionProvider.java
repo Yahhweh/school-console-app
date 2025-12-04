@@ -20,17 +20,17 @@ public class ConnectionProvider {
         this.properties = loadProperties(propertiesFileName);
     }
 
-    public Connection getConnection() throws  SQLException {
-            return DriverManager.getConnection(
-                properties.getProperty("ds.url"),
-                properties.getProperty("ds.username"),
-                properties.getProperty("ds.password")
-            );
+    public Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(
+            properties.getProperty("ds.url"),
+            properties.getProperty("ds.username"),
+            properties.getProperty("ds.password")
+        );
     }
 
     private Properties loadProperties(String fileName) throws IOException {
         Properties props = new Properties();
-        try(InputStream input = getClass().getClassLoader().getResourceAsStream(fileName);) {
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream(fileName);) {
             if (input == null) {
                 throw new DBException("Config file not found: " + fileName);
             }

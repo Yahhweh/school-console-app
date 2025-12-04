@@ -1,7 +1,7 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcGroupDao;
-import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcStudentDao;
+import kegly.organisation.schoolconsoleapp.dao.GroupDao;
+import kegly.organisation.schoolconsoleapp.dao.StudentDao;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
 
@@ -23,13 +23,13 @@ public class StudentsGenerator implements DataGenerator {
         "Thomas", "Taylor", "Moore", "Jackson", "Martin"
     );
 
-    private final JdbcStudentDao jdbcStudentDao;
-    private final JdbcGroupDao jdbcGroupDao;
+    private final StudentDao studentDao;
+    private final GroupDao groupDao;
     private final Random random = new Random();
 
-    public StudentsGenerator(JdbcStudentDao jdbcStudentDao, JdbcGroupDao jdbcGroupDao) {
-        this.jdbcStudentDao = jdbcStudentDao;
-        this.jdbcGroupDao = jdbcGroupDao;
+    public StudentsGenerator(StudentDao studentDao, GroupDao groupDao) {
+        this.studentDao = studentDao;
+        this.groupDao = groupDao;
     }
 
     @Override
@@ -38,13 +38,13 @@ public class StudentsGenerator implements DataGenerator {
             String firstName = FIRST_NAMES.get(random.nextInt(FIRST_NAMES.size()));
             String lastName = LAST_NAMES.get(random.nextInt(LAST_NAMES.size()));
 
-            jdbcStudentDao.save(new Student(null, null, firstName, lastName));
+            studentDao.save(new Student(null, null, firstName, lastName));
         }
     }
 
     public void assignRandomGroups(int minStudents, int maxStudents) {
-        List<Group> groups = jdbcGroupDao.findAll();
-        List<Student> allStudents = jdbcStudentDao.findAll();
+        List<Group> groups = groupDao.findAll();
+        List<Student> allStudents = studentDao.findAll();
 
         Collections.shuffle(allStudents);
         Queue<Student> studentQueue = new ArrayDeque<>(allStudents);
@@ -65,7 +65,7 @@ public class StudentsGenerator implements DataGenerator {
 
                 if (student != null) {
                     student.setGroupId(group.getId());
-                    jdbcStudentDao.update(student);
+                    studentDao.update(student);
                 }
             }
         }

@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 public class SchemaLoader {
 
     public void runScript(Connection connection, String scriptName) {
-
         try (InputStream input = getClass().getClassLoader().getResourceAsStream(scriptName)) {
 
             if (input == null) {

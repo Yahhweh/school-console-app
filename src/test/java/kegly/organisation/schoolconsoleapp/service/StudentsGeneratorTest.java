@@ -1,5 +1,7 @@
 package kegly.organisation.schoolconsoleapp.service;
 
+import kegly.organisation.schoolconsoleapp.dao.GroupDao;
+import kegly.organisation.schoolconsoleapp.dao.StudentDao;
 import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcGroupDao;
 import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcStudentDao;
 import kegly.organisation.schoolconsoleapp.entity.Student;
@@ -10,8 +12,8 @@ import static org.mockito.Mockito.*;
 
 class StudentsGeneratorTest {
 
-    JdbcStudentDao mockStudent;
-    JdbcGroupDao mockGroup;
+    StudentDao mockStudent;
+    GroupDao mockGroup;
     StudentsGenerator studentsGenerator;
     private static final int studentsAmount = 200;
 
@@ -24,7 +26,7 @@ class StudentsGeneratorTest {
     }
 
     @Test
-    public void randomCourses() {
+    public void generate_shouldSaveStudents() {
         studentsGenerator.generate(studentsAmount);
         verify(mockStudent, times(200)).save(any(Student.class));
     }

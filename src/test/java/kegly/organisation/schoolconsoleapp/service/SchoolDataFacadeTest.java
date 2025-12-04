@@ -1,9 +1,8 @@
 package kegly.organisation.schoolconsoleapp.service;
 
-import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcCourseDao;
-import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcGroupDao;
-import kegly.organisation.schoolconsoleapp.dao.jdbc.JdbcStudentDao;
-import kegly.organisation.schoolconsoleapp.db.ConnectionProvider;
+import kegly.organisation.schoolconsoleapp.dao.CourseDao;
+import kegly.organisation.schoolconsoleapp.dao.GroupDao;
+import kegly.organisation.schoolconsoleapp.dao.StudentDao;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,44 +23,29 @@ import static org.mockito.Mockito.when;
 class SchoolDataFacadeTest {
 
     @Mock
-    private JdbcStudentDao jdbcStudentDao;
+    private StudentDao studentDao;
     @Mock
-    private JdbcGroupDao jdbcGroupDao;
+    private GroupDao groupDao;
     @Mock
-    private JdbcCourseDao jdbcCourseDao;
-    @Mock
-    private ConnectionProvider connectionProvider;
+    private CourseDao courseDao;
 
     private SchoolDataFacade schoolDataFacade;
 
     @BeforeEach
     void setUp() {
-        schoolDataFacade = new SchoolDataFacade();
-        injectMock("jdbcStudentDao", jdbcStudentDao);
-        injectMock("jdbcGroupDao", jdbcGroupDao);
-        injectMock("jdbcCourseDao", jdbcCourseDao);
-        injectMock("connectionProvider", connectionProvider);
-    }
-
-    private void injectMock(String fieldName, Object mock) {
-        try {
-            Field field = SchoolDataFacade.class.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            field.set(schoolDataFacade, mock);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to inject mock for field: " + fieldName, e);
-        }
+        schoolDataFacade = new SchoolDataFacade(studentDao, groupDao, courseDao);
     }
 
     @Test
     void findGroupsWithLessOrEqualStudents_returnGroupsList_whenCountIsProvided() {
         int count = 15;
         List<Group> expected = Collections.singletonList(new Group(1, "Group A"));
-        when(jdbcGroupDao.findWithLessOrEqualStudents(count)).thenReturn(expected);
+
+        when(groupDao.findWithLessOrEqualStudents(count)).thenReturn(expected);
 
         List<Group> result = schoolDataFacade.findGroupsWithLessOrEqualStudents(count);
 
-        verify(jdbcGroupDao).findWithLessOrEqualStudents(count);
+        verify(groupDao).findWithLessOrEqualStudents(count);
         assertEquals(expected, result);
     }
 
@@ -70,11 +53,12 @@ class SchoolDataFacadeTest {
     void findStudentsByCourseName_returnStudentList_whenCourseNameIsRight() {
         String courseName = "Math";
         List<Student> expected = Collections.singletonList(new Student(1, 1, "John", "Doe"));
-        when(jdbcStudentDao.findByCourseName(courseName)).thenReturn(expected);
+
+        when(studentDao.findByCourseName(courseName)).thenReturn(expected);
 
         List<Student> result = schoolDataFacade.findByCourseName(courseName);
 
-        verify(jdbcStudentDao).findByCourseName(courseName);
+        verify(studentDao).findByCourseName(courseName);
         assertEquals(expected, result);
     }
 
@@ -86,7 +70,7 @@ class SchoolDataFacadeTest {
 
         schoolDataFacade.addNewStudent(firstName, lastName, groupId);
 
-        verify(jdbcStudentDao).save(any(Student.class));
+        verify(studentDao).save(any(Student.class));
     }
 
     @Test
@@ -95,7 +79,7 @@ class SchoolDataFacadeTest {
 
         schoolDataFacade.deleteStudentById(studentId);
 
-        verify(jdbcStudentDao).deleteById(studentId);
+        verify(studentDao).deleteById(studentId);
     }
 
     @Test
@@ -105,7 +89,7 @@ class SchoolDataFacadeTest {
 
         schoolDataFacade.addStudentToCourse(studentId, courseId);
 
-        verify(jdbcStudentDao).addCourseToStudent(studentId, courseId);
+        verify(studentDao).addCourseToStudent(studentId, courseId);
     }
 
     @Test
@@ -115,6 +99,6 @@ class SchoolDataFacadeTest {
 
         schoolDataFacade.removeStudentFromCourse(studentId, courseId);
 
-        verify(jdbcStudentDao).removeFromCourse(studentId, courseId);
+        verify(studentDao).removeFromCourse(studentId, courseId);
     }
 }
