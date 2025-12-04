@@ -14,7 +14,7 @@ class CourseDaoTest extends AbstractDaoTest {
     private CourseDao courseDao;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         this.courseDao = new JdbcCourseDao(super.connectionProvider);
     }
 

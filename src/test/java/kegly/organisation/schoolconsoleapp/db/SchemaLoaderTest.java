@@ -17,15 +17,14 @@ class SchemaLoaderTest {
         ConnectionProvider connectionProvider = new ConnectionProvider();
         final String initialSql = "schema.sql";
 
-        try(Connection connection = connectionProvider.getConnection()) {
+        try (Connection connection = connectionProvider.getConnection()) {
             SchemaLoader schemaLoader = new SchemaLoader();
             schemaLoader.runScript(connection, initialSql);
 
             boolean tableExists = checkTableExists(connection, "students");
             assertTrue(tableExists);
-        }
-        catch (Exception e){
-            fail("Initialization failed:: "+  e.getMessage());
+        } catch (Exception e) {
+            fail("Initialization failed:: " + e.getMessage());
         }
     }
 

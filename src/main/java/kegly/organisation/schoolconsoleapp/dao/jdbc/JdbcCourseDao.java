@@ -27,7 +27,7 @@ public class JdbcCourseDao implements CourseDao {
     @Override
     public List<Course> findAll() {
         try (Connection connection = connectionProvider.getConnection();
-                PreparedStatement st = connection.prepareStatement(FIND_SQL); ResultSet rs = st.executeQuery()) {
+             PreparedStatement st = connection.prepareStatement(FIND_SQL); ResultSet rs = st.executeQuery()) {
 
             List<Course> result = new ArrayList<>();
             while (rs.next()) {

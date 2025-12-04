@@ -12,6 +12,7 @@ public class GroupsGeneratorTest {
     private JdbcGroupDao mockJdbcGroupDao;
     private GroupsGenerator groupsGenerator;
     private static final int groupsAmount = 10;
+
     @BeforeEach
     void setup() {
         mockJdbcGroupDao = mock(JdbcGroupDao.class);
