@@ -5,9 +5,9 @@ import kegly.organisation.schoolconsoleapp.dao.GroupDao;
 import kegly.organisation.schoolconsoleapp.dao.StudentDao;
 import kegly.organisation.schoolconsoleapp.entity.Group;
 import kegly.organisation.schoolconsoleapp.entity.Student;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -28,13 +28,8 @@ class SchoolDataFacadeTest {
     private GroupDao groupDao;
     @Mock
     private CourseDao courseDao;
-
+    @InjectMocks
     private SchoolDataFacade schoolDataFacade;
-
-    @BeforeEach
-    void setUp() {
-        schoolDataFacade = new SchoolDataFacade(studentDao, groupDao, courseDao);
-    }
 
     @Test
     void findGroupsWithLessOrEqualStudents_returnGroupsList_whenCountIsProvided() {

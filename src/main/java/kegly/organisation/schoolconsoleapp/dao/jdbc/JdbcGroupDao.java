@@ -41,7 +41,8 @@ public class JdbcGroupDao implements GroupDao {
             }
             return result;
 
-        } catch (SQLException exception) {
+        } catch (
+            SQLException exception) {
             throw new DaoException(exception.toString());
         }
     }
@@ -62,7 +63,8 @@ public class JdbcGroupDao implements GroupDao {
                 }
             }
 
-        } catch (SQLException exception) {
+        } catch (
+            SQLException exception) {
             throw new DaoException(exception.getMessage());
         }
     }
@@ -80,7 +82,8 @@ public class JdbcGroupDao implements GroupDao {
                     groups.add(mapRow(resultSet));
                 }
             }
-        } catch (SQLException e) {
+        } catch (
+            SQLException e) {
             throw new DaoException("Failed to find groups with student count constraint", e);
         }
         return groups;

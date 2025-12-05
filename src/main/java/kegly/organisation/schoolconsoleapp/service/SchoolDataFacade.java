@@ -10,14 +10,14 @@ import java.util.List;
 
 public class SchoolDataFacade {
 
-    private final StudentDao studentDao;
-    private final GroupDao groupDao;
-    private final CourseDao courseDao;
-    private static final int coursesAmount = 10;
-    private static final int groupsAmount = 10;
+    private static final int COURSE_AMOUNT = 10;
+    private static final int GROUPS_AMOUNT = 10;
     private static final int studentsAmount = 200;
     private static final int MIN_COURSES_PER_STUDENT = 1;
     private static final int MAX_COURSES_PER_STUDENT = 3;
+    private final StudentDao studentDao;
+    private final GroupDao groupDao;
+    private final CourseDao courseDao;
 
     public SchoolDataFacade(StudentDao studentDao, GroupDao groupDao, CourseDao courseDao) {
         this.studentDao = studentDao;
@@ -29,8 +29,8 @@ public class SchoolDataFacade {
         System.out.println("Initializing database schema");
 
         System.out.println("Generating data");
-        new CourseGenerator(courseDao).generate(coursesAmount);
-        new GroupsGenerator(groupDao).generate(groupsAmount);
+        new CourseGenerator(courseDao).generate(COURSE_AMOUNT);
+        new GroupsGenerator(groupDao).generate(GROUPS_AMOUNT);
         StudentsGenerator studentsGenerator = new StudentsGenerator(studentDao, groupDao);
         studentsGenerator.generate(studentsAmount);
         studentsGenerator.assignRandomGroups(10, 30);

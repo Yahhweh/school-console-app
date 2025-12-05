@@ -13,7 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcCourseDao implements CourseDao {
-    private static final String FIND_COURSES_BY_STUDENT_ID_SQL = "SELECT c.course_id, c.course_name, c.course_description " + "FROM courses c " + "JOIN student_courses sc ON c.course_id = sc.course_id " + "WHERE sc.student_id = ?";
+
+    private static final String FIND_COURSES_BY_STUDENT_ID_SQL = """
+        SELECT c.course_id, c.course_name, c.course_description 
+        FROM courses c 
+        JOIN student_courses sc ON c.course_id = sc.course_id 
+        WHERE sc.student_id = ? 
+        """;
 
     private final static String FIND_SQL = "SELECT * FROM courses";
     private final static String SAVE_SQL = "INSERT INTO courses(course_name, course_description) VALUES (?, ?)";
@@ -27,7 +33,8 @@ public class JdbcCourseDao implements CourseDao {
     @Override
     public List<Course> findAll() {
         try (Connection connection = connectionProvider.getConnection();
-             PreparedStatement st = connection.prepareStatement(FIND_SQL); ResultSet rs = st.executeQuery()) {
+             PreparedStatement st = connection.prepareStatement(FIND_SQL);
+             ResultSet rs = st.executeQuery()) {
 
             List<Course> result = new ArrayList<>();
             while (rs.next()) {

@@ -2,7 +2,7 @@ package kegly.organisation.schoolconsoleapp.dao.jdbc;
 
 import kegly.organisation.schoolconsoleapp.db.ConnectionProvider;
 import kegly.organisation.schoolconsoleapp.db.SchemaLoader;
-import org.junit.jupiter.api.BeforeEach; // Обязательно!
+import org.junit.jupiter.api.BeforeEach;
 
 import java.sql.Connection;
 import java.sql.Statement;
@@ -14,7 +14,6 @@ public abstract class AbstractDaoTest {
     @BeforeEach
     public void setup() throws Exception {
         connectionProvider = new ConnectionProvider("testApplication.properties");
-        String initialSql = "data.sql";
 
         try (Connection conn = connectionProvider.getConnection();
              Statement statement = conn.createStatement()) {
@@ -22,7 +21,7 @@ public abstract class AbstractDaoTest {
             statement.execute("DROP ALL OBJECTS");
 
             SchemaLoader initializer = new SchemaLoader();
-            initializer.runScript(conn, initialSql);
+            initializer.runScript(conn, "schema.sql");
         }
     }
 }

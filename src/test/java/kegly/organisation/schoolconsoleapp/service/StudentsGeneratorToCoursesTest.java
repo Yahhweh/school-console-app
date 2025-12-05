@@ -6,7 +6,10 @@ import kegly.organisation.schoolconsoleapp.entity.Course;
 import kegly.organisation.schoolconsoleapp.entity.Student;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,9 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class StudentsGeneratorToCoursesTest {
 
+    @Mock
     private StudentDao mockStudentDao;
+    @Mock
     private CourseDao mockCourseDao;
     private StudentsToCoursesGenerator studentsToCoursesGenerator;
 
@@ -31,8 +37,6 @@ class StudentsGeneratorToCoursesTest {
 
     @BeforeEach
     void setup() {
-        mockStudentDao = mock(StudentDao.class);
-        mockCourseDao = mock(CourseDao.class);
 
         studentsToCoursesGenerator = new StudentsToCoursesGenerator(
             mockStudentDao,

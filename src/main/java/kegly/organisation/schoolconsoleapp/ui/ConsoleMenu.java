@@ -34,7 +34,8 @@ public class ConsoleMenu {
                     running = false;
                     System.out.println("Exiting...");
                 }
-                default -> System.out.println("Invalid option. Please try again.");
+                default ->
+                    System.out.println("Invalid option. Please try again.");
             }
             System.out.println();
         }
